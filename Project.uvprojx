@@ -686,6 +686,11 @@
               <FileType>5</FileType>
               <FilePath>.\Com\Com_def.h</FilePath>
             </File>
+            <File>
+              <FileName>Com_board.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Com\Com_board.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
