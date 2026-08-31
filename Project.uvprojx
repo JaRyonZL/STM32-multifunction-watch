@@ -711,6 +711,16 @@
               <FileType>5</FileType>
               <FilePath>.\Drv\Drv_gpio.h</FilePath>
             </File>
+            <File>
+              <FileName>Drv_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drv\Drv_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drv\Drv_delay.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
