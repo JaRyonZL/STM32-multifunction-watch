@@ -751,6 +751,16 @@
               <FileType>5</FileType>
               <FilePath>.\Drv\Drv_adc.h</FilePath>
             </File>
+            <File>
+              <FileName>Drv_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drv\Drv_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_rtc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drv\Drv_rtc.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
