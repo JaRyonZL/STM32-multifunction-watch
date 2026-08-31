@@ -771,6 +771,16 @@
               <FileType>5</FileType>
               <FilePath>.\Drv\Drv_tim.h</FilePath>
             </File>
+            <File>
+              <FileName>Drv_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drv\Drv_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_pwr.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drv\Drv_pwr.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
