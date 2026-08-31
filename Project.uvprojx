@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Start;.\User;.\Library</IncludePath>
+              <IncludePath>.\Start;.\User;.\Library;.\Com;.\Drv;.\Inf;.\App</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -672,6 +672,30 @@
               <FilePath>.\User\stm32f10x_it.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>Com</GroupName>
+          <Files>
+            <File>
+              <FileName>Com_def.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Com\Com_def.c</FilePath>
+            </File>
+            <File>
+              <FileName>Com_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Com\Com_def.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Drv</GroupName>
+        </Group>
+        <Group>
+          <GroupName>Inf</GroupName>
+        </Group>
+        <Group>
+          <GroupName>App</GroupName>
         </Group>
       </Groups>
     </Target>
