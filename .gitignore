@@ -1,0 +1,25 @@
+# Keil MDK 构建产物
+Objects/
+Listings/
+DebugConfig/
+
+# 用户会话文件
+*.uvguix.*
+*.uvoptx
+
+# 编译中间文件
+*.o
+*.d
+*.crf
+*.axf
+*.hex
+*.map
+*.htm
+*.lnp
+*.sct
+*.dep
+*.build_log.htm
+*.bak
+
+# J-Link 日志
+JLinkLog.txt
