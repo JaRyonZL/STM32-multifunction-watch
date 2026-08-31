@@ -721,6 +721,16 @@
               <FileType>5</FileType>
               <FilePath>.\Drv\Drv_delay.h</FilePath>
             </File>
+            <File>
+              <FileName>Drv_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drv\Drv_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drv\Drv_uart.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
