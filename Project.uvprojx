@@ -731,6 +731,16 @@
               <FileType>5</FileType>
               <FilePath>.\Drv\Drv_uart.h</FilePath>
             </File>
+            <File>
+              <FileName>Drv_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drv\Drv_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drv\Drv_spi.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
