@@ -700,6 +700,18 @@
         </Group>
         <Group>
           <GroupName>Drv</GroupName>
+          <Files>
+            <File>
+              <FileName>Drv_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drv\Drv_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drv\Drv_gpio.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Inf</GroupName>
