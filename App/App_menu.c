@@ -2,6 +2,7 @@
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
 #include "Inf_key.h"
+#include "Com_oled_res.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -288,4 +289,176 @@ void App_menu_run_list(App_menu_option2_t* option)
 		}
 		/* 旧工程menu_Back_event恒0，对应分支已删除 */
 	}
+}
+
+/**
+  * 函    数：App_menu_run_wheel
+  * 功    能：32x32图标轮盘菜单，根据按键事件切换并执行对应功能
+  * 说    明：由旧工程run_menu1迁移，选项数组以{".."}结尾
+  *           按键事件由Inf_key_scan提供：1=上 2=下 3=确定短按 4=确定长按
+  */
+void App_menu_run_wheel(App_menu_option1_t* option)
+{
+	int8_t sel_index = 1;        /* 选中项下标 */
+	int8_t item_max = 0;         /* 选项数量-1 */
+	int8_t scroll_offset = 0;    /* 图标滚动偏移 */
+	int8_t show_center_prev;     /* 上次显示中心下标 */
+	int8_t icon_rise = 40;       /* 图标上移量（进入时从上方落下） */
+	float name_width_target = 0, name_width_current = 0;   /* 名称下划线目标/当前宽度 */
+
+	while (option[++item_max].Name[0] != '.');   /* 以".."结尾，取选项数量 */
+	item_max--;
+
+	for (int8_t i = 0; i <= item_max; i++)       /* 计算所有选项名称宽度 */
+	{
+		option[i].NameLen = App_menu_get_name_len(option[i].Name);
+	}
+
+	show_center_prev = item_max;
+
+	Inf_oled_fade_flag = 1;
+
+	while (1)
+	{
+		uint8_t key = Inf_key_scan();   /* 获取按键事件 */
+
+		Inf_oled_clear();
+
+		if (key == 1 || key == 2)       /* 如果有上下键事件 */
+		{
+			sel_index += (key == 1) ? 1 : -1;
+
+			if (sel_index < 0) { sel_index = 0; }               /* 限制选中项下标 */
+			if (sel_index > item_max) { sel_index = item_max; }
+		}
+
+		/* 显示部分 */
+		if (sel_index - show_center_prev)       /* 若中心下标有偏移 */
+		{
+			scroll_offset = (sel_index - show_center_prev) * 40;
+			show_center_prev = sel_index;
+
+			name_width_target = option[sel_index].NameLen * APP_MENU_WORD_W;
+		}
+		if (scroll_offset) { scroll_offset /= 1.15; }   /* 滚动变化速度 */
+		if (icon_rise) { icon_rise /= 1.3; }            /* 图标落下变化速度 */
+
+		if (name_width_current < name_width_target)     /* 下划线宽度比例逼近 */
+		{
+			if (name_width_target - name_width_current > 10) name_width_current += 5;
+			else if (name_width_target - name_width_current > 5) name_width_current += 2.5;
+			else if (name_width_target - name_width_current > 0) name_width_current += 0.5;
+		}
+		if (name_width_current > name_width_target)
+		{
+			if (name_width_current - name_width_target > 10) name_width_current -= 5;
+			else if (name_width_current - name_width_target > 5) name_width_current -= 2.5;
+			else if (name_width_current - name_width_target > 0) name_width_current -= 0.5;
+		}
+
+		for (int8_t i = -2; i < 3; i++)     /* 显示中心前后各2个图标 */
+		{
+			int8_t icon_x = i * 40 + scroll_offset + 48;
+
+			if (sel_index + i < 0) { continue; }
+			if (sel_index + i > item_max) { break; }
+
+			Inf_oled_show_image(icon_x, 8 - icon_rise, 32, 32, option[sel_index + i].Image);
+		}
+
+		/* 名称与下划线（旧工程在图标循环内重复绘制5次，效果等价，提至循环外） */
+		uint8_t name_shift = abs(scroll_offset / 3);
+
+		Inf_oled_show_string(64 - name_width_target / 2, 50 + name_shift, option[sel_index].Name, OLED_6X8);
+
+		Inf_oled_draw_rectangle(64 - (name_width_current / 2) - 2, 63, name_width_current + 4, 1, OLED_UNFILLED);
+
+		/* 刷新屏幕 */
+		Inf_oled_update();
+
+		Inf_oled_gradient(1);
+
+		/* 获取按键（短按/长按等效，与旧工程一致） */
+		if (key == 3 || key == 4)
+		{
+			/* 如果功能不为空执行功能，否则返回 */
+			if (option[sel_index].func)
+			{
+				Inf_oled_fade_flag = 1;
+				Inf_oled_gradient(0);
+
+				option[sel_index].func();
+
+				Inf_oled_fade_flag = 1;
+				icon_rise = 40;
+				scroll_offset = -40;
+			}
+			else
+			{
+				Inf_oled_fade_flag = 1;
+				Inf_oled_gradient(0);
+
+				return;
+			}
+		}
+		/* 旧工程menu_Back_event恒0，对应分支已删除 */
+	}
+}
+
+/******************************************************************************
+ * 应用入口占位函数（C3~C13迁移对应模块后删除，改用各App模块真实实现）
+ ******************************************************************************/
+void App_voltage_run(void) {}
+void App_mp3_run(void) {}
+void App_qrcode_wechat(void) {}
+void App_qrcode_zfb(void) {}
+void App_video_menu(void) {}
+void App_game_run(void) {}
+void App_calc_cos(void) {}
+void App_font_browser(void) {}
+void App_settings_run(void) {}
+void App_flashlight(void) {}
+void App_error(void) {}
+void App_biaopan_time_adjust(void) {}
+
+/**
+  * 函    数：App_menu_main_wheel
+  * 功    能：表盘轮盘菜单入口（旧工程main_menu1迁移）
+  * 说    明：选项格式{名称, 选中执行函数, 32x32图标}
+  */
+void App_menu_main_wheel(void)
+{
+	App_menu_option1_t option_list[] = {
+		{"返回表盘"        , APP_MENU_RETURN,   APPBIPAN},
+		{"电压测量"        , App_voltage_run,   APPADDV},
+		{"音乐"            , App_mp3_run,       APPYYBF},
+		{"收款微信"        , App_qrcode_wechat, APPWXZF},
+		{"收款支付宝"      , App_qrcode_zfb,    APPZFBZF},
+		{"视频"            , App_video_menu,    APPVIDEO},
+		{"Life_Play"       , App_game_run,      APPGAME},
+		{"cos(x)-1"        , App_calc_cos,      bug},
+		{"W25Q128字库浏览" , App_font_browser,  bug},
+		{"设置"            , App_settings_run,  APPsetting},
+		{".."}                                  /* 结尾标志，不可删除 */
+	};
+
+	App_menu_run_wheel(option_list);
+}
+
+/**
+  * 函    数：App_menu_main_list
+  * 功    能：列表菜单入口（旧工程main_menu2迁移）
+  * 说    明：选项格式{名称, 模式, 选中执行函数, 绑定变量, 名称宽度}
+  */
+void App_menu_main_list(void)
+{
+	App_menu_option2_t option_list[] = {
+		{"- 返回"    , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,         0, 0},
+		{"- 手电筒"  , APP_MENU_MODE_FUNCTION, App_flashlight,          0, 0},
+		{"- 便签"    , APP_MENU_MODE_FUNCTION, App_error,               0, 0},
+		{"- 时间调整", APP_MENU_MODE_FUNCTION, App_biaopan_time_adjust, 0, 0},
+		{".."}                                  /* 结尾标志，不可删除 */
+	};
+
+	App_menu_run_list(option_list);
 }

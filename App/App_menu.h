@@ -1,8 +1,3 @@
-/*
- * @Author: JaRyon
- * @Date: 2026-09-01 17:30:53
- * @Email: jaryonzl@163.com
- */
 #ifndef __APP_MENU_H
 #define __APP_MENU_H
 
@@ -33,7 +28,7 @@
 #define APP_MENU_WORD_W         6       /* 单字显示宽度（原WORD_H） */
 #define APP_MENU_CURSOR_SPEED   12      /* 光标移动速度系数（原Speed_Factor） */
 #define APP_MENU_SCROLL_SPEED   1.3f    /* 列表滚动速度系数（原Roll_Speed） */
-#define APP_MENU_BAR_SPEED      10       /* 边栏进度条逼近速度系数 */
+#define APP_MENU_BAR_SPEED      4       /* 边栏进度条逼近速度系数（越小越跟手） */
 
 extern uint8_t App_menu_cursor;         /* 光标样式：0=反色 1=方框 2=箭头（设置项） */
 
@@ -64,5 +59,8 @@ uint8_t App_menu_get_name_len(char* String);    /* 计算名称显示宽度：GBK一字=2列
 void App_menu_reverse_area_frame(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height); /* 空心反色框 */
 void App_menu_run_list(App_menu_option2_t* option);  /* 列表菜单 */
 void App_menu_run_wheel(App_menu_option1_t* option); /* 图标轮盘菜单 */
+
+void App_menu_main_wheel(void);   /* 表盘轮盘菜单入口（旧main_menu1） */
+void App_menu_main_list(void);    /* 列表菜单入口（旧main_menu2） */
 
 #endif
