@@ -8,6 +8,6 @@
 
 #include "Com_def.h"
 
-void Drv_tim2_init(void);                       /* TIM2初始化，1s更新中断 */
+void Drv_tim2_init(void);                       /* TIM2初始化，1ms更新中断 */
 
 #endif
