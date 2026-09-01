@@ -4,6 +4,7 @@
 #include "Inf_rtc.h"
 #include "Inf_mp3.h"
 #include "Inf_battery.h"
+#include "Inf_key.h"
 #include "Com_oled_res.h"
 
 /******************************************************************************
