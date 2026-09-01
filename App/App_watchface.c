@@ -2,6 +2,7 @@
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
 #include "Inf_rtc.h"
+#include "Inf_mp3.h"
 #include "Com_oled_res.h"
 
 /******************************************************************************
@@ -93,4 +94,82 @@ void App_watchface_show_time(uint8_t X, uint8_t Y)
 	ones = value % 10;
 	App_watchface_draw_digit(X + 95, Y + 8, ones, 0);
 	App_watchface_draw_digit(X + 81, Y + 8, (value - ones) / 10, 0);
+}
+
+extern uint8_t TLYPW;   /* 体感开关状态（预留：待Inf_mpu6050迁入后归其定义，暂由main.c定义） */
+
+/**
+  * 函    数：App_watchface_date
+  * 功    能：显示日期：年/月/日
+  * 说    明：复用App_watchface_show_time读取的Inf_rtc_time，调用顺序勿乱
+  */
+void App_watchface_date(uint8_t X, uint8_t Y)
+{
+	Inf_oled_show_num(X, Y, Inf_rtc_time[0], 4, OLED_6X8);
+	Inf_oled_show_num(X + 26, Y, Inf_rtc_time[1], 2, OLED_6X8);
+	Inf_oled_show_num(X + 40, Y, Inf_rtc_time[2], 2, OLED_6X8);
+}
+
+/**
+  * 函    数：App_watchface_week
+  * 功    能：显示星期："week:"+数字（原biaopan_week）
+  * 说    明：Inf_rtc_time[6]：0=周一~5=周六，6=周日显示R
+  */
+void App_watchface_week(uint8_t X, uint8_t Y)
+{
+	uint16_t week = Inf_rtc_time[6];
+
+	Inf_oled_show_ascii(X, Y, "week:", OLED_6X8);
+	switch (week)
+	{
+		case 1: Inf_oled_show_ascii(X + 30, Y, "2", OLED_6X8); break;
+		case 2: Inf_oled_show_ascii(X + 30, Y, "3", OLED_6X8); break;
+		case 3: Inf_oled_show_ascii(X + 30, Y, "4", OLED_6X8); break;
+		case 4: Inf_oled_show_ascii(X + 30, Y, "5", OLED_6X8); break;
+		case 5: Inf_oled_show_ascii(X + 30, Y, "6", OLED_6X8); break;
+		case 6: Inf_oled_show_ascii(X + 30, Y, "R", OLED_6X8); break;
+		case 0: Inf_oled_show_ascii(X + 30, Y, "1", OLED_6X8); break;
+	}
+}
+
+/**
+  * 函    数：App_watchface_show_app_status
+  * 功    能：显示小模块开关状态图标：MP3上电/体感
+  */
+void App_watchface_show_app_status(uint8_t X, uint8_t Y)
+{
+	uint8_t offset = 0;
+
+	if (Inf_mp3_is_powered())       /* MP3模块已上电 */
+	{
+		Inf_oled_show_image(X + offset, Y, 8, 8, APPYYBFsmall);
+		offset += 10;
+	}
+	if (TLYPW)                      /* 体感功能开启 */
+	{
+		Inf_oled_show_image(X + offset, Y, 8, 8, APPTLYsmall);
+		offset += 10;
+	}
+
+	if (offset == 0)
+	{
+		Inf_oled_show_ascii(0, 0, "-", OLED_6X8);   
+	}
+}
+
+/**
+  * 函    数：App_watchface_run
+  * 功    能：表盘刷新入口
+  * 说    明：show_time内部读取RTC，日期/星期复用其结果
+  */
+void App_watchface_run(void)
+{
+	Inf_oled_clear();
+
+	App_watchface_show_app_status(0, 0);
+	App_watchface_show_time(5, 18);
+	App_watchface_date(0, 56);
+	App_watchface_week(90, 57);
+
+	Inf_oled_update();
 }
