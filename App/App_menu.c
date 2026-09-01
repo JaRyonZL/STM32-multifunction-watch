@@ -419,7 +419,7 @@ void App_font_browser(void) {}
 void App_settings_run(void) {}
 void App_flashlight(void) {}
 void App_error(void) {}
-void App_biaopan_time_adjust(void) {}
+void App_watchface_time_adjust(void) {}
 
 /**
   * 函    数：App_menu_main_wheel
@@ -456,7 +456,7 @@ void App_menu_main_list(void)
 		{"- 返回"    , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,         0, 0},
 		{"- 手电筒"  , APP_MENU_MODE_FUNCTION, App_flashlight,          0, 0},
 		{"- 便签"    , APP_MENU_MODE_FUNCTION, App_error,               0, 0},
-		{"- 时间调整", APP_MENU_MODE_FUNCTION, App_biaopan_time_adjust, 0, 0},
+		{"- 时间调整", APP_MENU_MODE_FUNCTION, App_watchface_time_adjust, 0, 0},
 		{".."}                                  /* 结尾标志，不可删除 */
 	};
 
