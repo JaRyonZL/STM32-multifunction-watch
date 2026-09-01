@@ -27,5 +27,7 @@
 uint8_t  Drv_rtc_init(void);                    /* RTC初始化，返回1=首次初始化，0=非首次 */
 void     Drv_rtc_set_counter(uint32_t Counter); /* 写计数器 */
 uint32_t Drv_rtc_get_counter(void);             /* 读计数器 */
+void     Drv_rtc_set_prescaler(uint32_t Prescaler);
+uint32_t Drv_rtc_get_prescaler(void);
 
 #endif
