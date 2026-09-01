@@ -866,6 +866,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_rtc.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_mp3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_mp3.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_mp3.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_mp3.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
