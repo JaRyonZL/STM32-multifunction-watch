@@ -10,5 +10,6 @@
 
 void     Drv_tim2_init(void);     
 uint32_t Drv_tim2_get_tick(void); 
+uint32_t Drv_tim2_get_us(void);
 
 #endif

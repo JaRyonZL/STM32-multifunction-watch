@@ -65,3 +65,22 @@ void TIM2_IRQHandler(void)
 		s_tick_ms++;    /* 累加1ms计数 */
 	}
 }
+
+/**
+  * 函    数：Drv_tim2_get_us
+  * 功    能：读取微秒级时间（1ms心跳+计数器细分，用于精确计时）
+  */
+uint32_t Drv_tim2_get_us(void)
+{
+	uint32_t cnt_before, cnt_after;
+	uint32_t tick;
+
+	do
+	{
+		cnt_before = TIM_GetCounter(TIM2);
+		tick = s_tick_ms;
+		cnt_after = TIM_GetCounter(TIM2);
+	} while (cnt_after < cnt_before);   /* 若读取期间跨毫秒回绕，重读保证一致 */
+
+	return tick * 1000 + cnt_after;
+}
