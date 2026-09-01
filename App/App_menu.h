@@ -1,3 +1,8 @@
+/*
+ * @Author: JaRyon
+ * @Date: 2026-09-01 17:30:53
+ * @Email: jaryonzl@163.com
+ */
 #ifndef __APP_MENU_H
 #define __APP_MENU_H
 
@@ -28,6 +33,7 @@
 #define APP_MENU_WORD_W         6       /* 单字显示宽度（原WORD_H） */
 #define APP_MENU_CURSOR_SPEED   12      /* 光标移动速度系数（原Speed_Factor） */
 #define APP_MENU_SCROLL_SPEED   1.3f    /* 列表滚动速度系数（原Roll_Speed） */
+#define APP_MENU_BAR_SPEED      10       /* 边栏进度条逼近速度系数 */
 
 extern uint8_t App_menu_cursor;         /* 光标样式：0=反色 1=方框 2=箭头（设置项） */
 

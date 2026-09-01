@@ -154,8 +154,9 @@ void App_menu_run_list(App_menu_option2_t* option)
 		if (sel_index == item_max) { bar_target = 64; }
 		else { bar_target = bar_step * sel_index; }
 
-		if (bar_current < bar_target) { bar_current += 1.4; }
-		if (bar_current > bar_target) { bar_current -= 1.4; }
+		if (bar_target - bar_current > 1) { bar_current += (bar_target - bar_current) / APP_MENU_BAR_SPEED + 1; }
+		else if (bar_current - bar_target > 1) { bar_current -= (bar_current - bar_target) / APP_MENU_BAR_SPEED + 1; }
+		else { bar_current = bar_target; }
 
 		Inf_oled_draw_line(123, 0, 127, 0);
 		Inf_oled_draw_line(125, 0, 125, 63);
@@ -169,7 +170,7 @@ void App_menu_run_list(App_menu_option2_t* option)
 		Inf_oled_gradient(1);
 
 		/* 获取按键 */
-		if (key == 3 || key == 4)       /* 短按与长按在此处等效（旧工程一致） */
+		if (key == 3 || key == 4)       /* 短按与长按在此处等效 */
 		{
 			if (option[sel_index].mode == APP_MENU_MODE_FUNCTION)    /* 如果是可进入函数 */
 			{
