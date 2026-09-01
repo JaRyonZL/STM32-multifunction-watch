@@ -836,6 +836,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_font.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_key.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_key.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
