@@ -826,6 +826,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_w25q.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_font.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_font.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_font.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_font.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
