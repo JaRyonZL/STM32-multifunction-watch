@@ -891,6 +891,16 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_menu.h</FilePath>
             </File>
+            <File>
+              <FileName>App_watchface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_watchface.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_watchface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_watchface.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
