@@ -25,6 +25,13 @@
 #define OLED_RES_PORT   GPIOA
 #define OLED_RES_PIN    GPIO_Pin_8      /* 复位 RES     -> PA8 */
 
+/* OLED引脚位号（软件SPI位带操作使用，与上方引脚宏保持一致） */
+#define OLED_CS_BIT     12
+#define OLED_DC_BIT     14
+#define OLED_D0_BIT     13
+#define OLED_D1_BIT     15
+#define OLED_RES_BIT    8
+
 /******************************************************************************
  * W25Q128外部Flash（SPI1硬件外设，片选由软件控制）
  ******************************************************************************/
