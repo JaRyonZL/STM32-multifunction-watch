@@ -785,6 +785,28 @@
         </Group>
         <Group>
           <GroupName>Inf</GroupName>
+          <Files>
+            <File>
+              <FileName>Inf_oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_oled.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_oled.h</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_oled_gfx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_oled_gfx.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_oled_gfx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_oled_gfx.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>App</GroupName>
