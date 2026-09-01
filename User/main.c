@@ -29,7 +29,6 @@ int main(void)
 
 	/* Calibration diagnostic: prescaler and measured RTC tick length */
 	Inf_oled_clear();
-	Inf_oled_printf(0, 0, OLED_6X8, "psc=%d", (int)Drv_rtc_get_prescaler());
 	{
 		uint32_t c0 = Drv_rtc_get_counter();
 		while (Drv_rtc_get_counter() == c0) {}
@@ -38,6 +37,12 @@ int main(void)
 		while (Drv_rtc_get_counter() == c0) {}
 		uint32_t u1 = Drv_tim2_get_us();
 		Inf_oled_printf(0, 16, OLED_6X8, "tick=%dus", (int)(u1 - u0));
+	}
+	{
+		uint32_t d0 = Drv_tim2_get_us();
+		Drv_delay_ms(1000);
+		uint32_t d1 = Drv_tim2_get_us();
+		Inf_oled_printf(0, 32, OLED_6X8, "dly=%dus", (int)(d1 - d0));
 	}
 	Inf_oled_update();
 	Drv_delay_ms(5000);
