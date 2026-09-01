@@ -880,6 +880,18 @@
         </Group>
         <Group>
           <GroupName>App</GroupName>
+          <Files>
+            <File>
+              <FileName>App_menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_menu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_menu.h</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
