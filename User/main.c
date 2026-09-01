@@ -2,7 +2,6 @@
 #include "Drv_delay.h"
 #include "Drv_adc.h"
 #include "Drv_tim.h"
-#include "Drv_rtc.h"
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
 #include "Inf_w25q.h"
@@ -26,26 +25,6 @@ int main(void)
 	Inf_rtc_init();
 	Inf_mp3_init();
 	Inf_key_init();
-
-	/* Calibration diagnostic: prescaler and measured RTC tick length */
-	Inf_oled_clear();
-	{
-		uint32_t c0 = Drv_rtc_get_counter();
-		while (Drv_rtc_get_counter() == c0) {}
-		uint32_t u0 = Drv_tim2_get_us();
-		c0 = Drv_rtc_get_counter();
-		while (Drv_rtc_get_counter() == c0) {}
-		uint32_t u1 = Drv_tim2_get_us();
-		Inf_oled_printf(0, 16, OLED_6X8, "tick=%dus", (int)(u1 - u0));
-	}
-	{
-		uint32_t d0 = Drv_tim2_get_us();
-		Drv_delay_ms(1000);
-		uint32_t d1 = Drv_tim2_get_us();
-		Inf_oled_printf(0, 32, OLED_6X8, "dly=%dus", (int)(d1 - d0));
-	}
-	Inf_oled_update();
-	Drv_delay_ms(5000);
 
 	while (1)
 	{
