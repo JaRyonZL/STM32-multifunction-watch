@@ -816,6 +816,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_oled_gfx.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_w25q.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_w25q.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_w25q.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_w25q.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
