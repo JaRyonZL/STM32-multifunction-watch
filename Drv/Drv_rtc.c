@@ -105,25 +105,3 @@ uint32_t Drv_rtc_get_counter(void)
 
 	return confirm;
 }
-
-/**
-  * 函    数：Drv_rtc_set_prescaler
-  * 功    能：设置RTC分频（自动进出配置模式，计数器值保持不变）
-  */
-void Drv_rtc_set_prescaler(uint32_t Prescaler)
-{
-	RTC_WaitForLastTask();
-	RTC_EnterConfigMode();
-	RTC_SetPrescaler(Prescaler);
-	RTC_ExitConfigMode();
-	RTC_WaitForLastTask();
-}
-
-/**
-  * 函    数：Drv_rtc_get_prescaler
-  * 功    能：读取RTC分频值
-  */
-uint32_t Drv_rtc_get_prescaler(void)
-{
-	return (((uint32_t)RTC->PRLH << 16) | RTC->PRLL);
-}
