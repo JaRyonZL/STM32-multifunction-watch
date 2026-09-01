@@ -856,6 +856,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_battery.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_rtc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_rtc.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
