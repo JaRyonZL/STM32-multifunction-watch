@@ -58,6 +58,12 @@ void Inf_rtc_set_time(void)
 	time_cnt = mktime(&time_date) - COM_RTC_UTC_OFFSET_HOURS * 60 * 60;
 	// 将时间戳写入RTC硬件
 	Drv_rtc_set_counter(time_cnt);
+
+	/* 校时基准同步到新计数器，避免补偿系数作用于人工时间跳变 */
+	if (s_calib_done)
+	{
+		s_calib_ref_cnt = Drv_rtc_get_counter();
+	}
 }
 
 /**
