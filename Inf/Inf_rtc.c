@@ -18,6 +18,10 @@ uint16_t Inf_rtc_time[] = {2026, 9, 1, 16, 2, 0, 0};  /* 首次初始化的默认时间 */
 
 static void Inf_rtc_calibrate_lsi(void);
 
+/* LSI校准状态：只测量不写RTC，显示时软件补偿漂移 */
+static uint8_t  s_calib_done = 0;                 /* 校准完成标志 */
+static uint32_t s_calib_ref_cnt = 0;              /* 校准时RTC计数器基准值 */
+static uint32_t s_calib_tick_us = 1000000UL;      /* 实测一个RTC秒的真实时长（微秒），未校准按1s */
 /**
   * 函    数：Inf_rtc_init
   * 功    能：初始化RTC，首次初始化时写入默认时间
@@ -66,7 +70,12 @@ void Inf_rtc_read_time(void)
 	time_t time_cnt;
 	struct tm time_date;
 	// 从RTC硬件读取时间戳并加上时区偏移换算为本地时间
-	time_cnt = Drv_rtc_get_counter() + COM_RTC_UTC_OFFSET_HOURS * 60 * 60;
+	time_cnt = Drv_rtc_get_counter();
+	if (s_calib_done)   // 鎸夊疄娴嬫瘡绉掔湡瀹炴椂闀胯ˉ鍋縇SI婕傜Щ
+	{
+		time_cnt = s_calib_ref_cnt + (uint32_t)((uint64_t)(time_cnt - s_calib_ref_cnt) * s_calib_tick_us / 1000000ULL);
+	}
+	time_cnt += COM_RTC_UTC_OFFSET_HOURS * 60 * 60;
 	// 将时间戳转换为结构体数据
 	time_date = *localtime(&time_cnt);
 	// 将结构体数据写入到设置数组中
@@ -93,17 +102,16 @@ void Inf_rtc_read_time(void)
 /**
   * 函    数：Inf_rtc_calibrate_lsi
   * 功    能：LSI走时校准：用TIM2心跳（HSE派生）实测一个RTC秒的真实时长，
-  *           推算LSI实际频率并重设分频，使走时精度对齐HSE
-  * 说    明：仅LSI模式调用；依赖Drv_tim2已初始化；超时放弃则保持原分频
+  *           记录补偿系数供Inf_rtc_read_time软件修正，不写任何RTC寄存器
+  * 说    明：仅LSI模式调用；依赖Drv_tim2已初始化；超时放弃则不补偿
   */
 static void Inf_rtc_calibrate_lsi(void)
 {
 	uint32_t us_start, us_end;
 	uint32_t us_wait;
 	uint32_t counter;
-	float lsi_actual;
 
-	// 等待RTC秒跳变作为测量起点（2s超时放弃）
+	// 等首次秒跳变作为测量起点（2s超时放弃）
 	counter = Drv_rtc_get_counter();
 	us_wait = Drv_tim2_get_us();
 	while (Drv_rtc_get_counter() == counter)
@@ -112,7 +120,7 @@ static void Inf_rtc_calibrate_lsi(void)
 	}
 	us_start = Drv_tim2_get_us();
 
-	// 再等一个秒跳变，实测一个RTC秒的真实时长
+	// 再等一个秒跳变，实测一个RTC秒的真实时长（2s超时放弃）
 	counter = Drv_rtc_get_counter();
 	us_wait = Drv_tim2_get_us();
 	while (Drv_rtc_get_counter() == counter)
@@ -123,9 +131,8 @@ static void Inf_rtc_calibrate_lsi(void)
 
 	if (us_end == us_start) { return; }   // 防除零
 
-	// 实际LSI频率 = 当前分频值 / 实测秒时长（微秒）
-	lsi_actual = (float)(Drv_rtc_get_prescaler() + 1) * 1000000.0f / (float)(us_end - us_start);
-
-	// 重设分频（四舍五入），RTC秒与HSE对齐
-	Drv_rtc_set_prescaler((uint32_t)(lsi_actual + 0.5f) - 1);
+	// 记录补偿系数：基准计数器值+实测每秒真实时长
+	s_calib_ref_cnt = Drv_rtc_get_counter();
+	s_calib_tick_us = us_end - us_start;
+	s_calib_done = 1;
 }
