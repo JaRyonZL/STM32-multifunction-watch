@@ -5,6 +5,7 @@
  */
 #include "Inf_rtc.h"
 #include "Drv_rtc.h"
+#include "Drv_tim.h"
 #include "Com_config.h"
 #include <time.h>
 
@@ -14,6 +15,8 @@
  ******************************************************************************/
 
 uint16_t Inf_rtc_time[] = {2026, 9, 1, 16, 2, 0, 0};  /* 首次初始化的默认时间 */
+
+static void Inf_rtc_calibrate_lsi(void);
 
 /**
   * 函    数：Inf_rtc_init
