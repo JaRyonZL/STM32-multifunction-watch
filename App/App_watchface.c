@@ -3,6 +3,7 @@
 #include "Inf_oled_gfx.h"
 #include "Inf_rtc.h"
 #include "Inf_mp3.h"
+#include "Inf_battery.h"
 #include "Com_oled_res.h"
 
 /******************************************************************************
@@ -167,9 +168,48 @@ void App_watchface_run(void)
 	Inf_oled_clear();
 
 	App_watchface_show_app_status(0, 0);
+	App_watchface_show_battery(89, 0);
 	App_watchface_show_time(5, 18);
 	App_watchface_date(0, 56);
 	App_watchface_week(90, 57);
 
 	Inf_oled_update();
+}
+
+/**
+  * 函    数：App_watchface_show_battery
+  * 功    能：显示电池电量图标与百分比（数据由Inf_battery提供）
+  */
+void App_watchface_show_battery(uint8_t X, uint8_t Y)
+{
+	uint8_t level = Inf_battery_get_level();   /* 查表插值+最小保持显示值 */
+
+	if (Inf_battery_is_charging())             /* 充电中显示"--" */
+	{
+		Inf_oled_show_ascii(X + 25, Y + 1, "--", OLED_6X8);
+	}
+
+	Inf_oled_draw_rectangle(X + 25, Y + 1, 12, 7, OLED_UNFILLED);   /* 电池图标 */
+	Inf_oled_draw_line(X + 37, Y + 3, X + 37, Y + 5);               /* 电池图标头部 */
+
+	/* 根据电量百分比填充格数 */
+	if (level > 9)  Inf_oled_draw_line(X + 26, Y + 2, X + 26, Y + 6);
+	if (level > 19) Inf_oled_draw_line(X + 27, Y + 2, X + 27, Y + 6);
+	if (level > 29) Inf_oled_draw_line(X + 28, Y + 2, X + 28, Y + 6);
+	if (level > 39) Inf_oled_draw_line(X + 29, Y + 2, X + 29, Y + 6);
+	if (level > 49) Inf_oled_draw_line(X + 30, Y + 2, X + 30, Y + 6);
+	if (level > 59) Inf_oled_draw_line(X + 31, Y + 2, X + 31, Y + 6);
+	if (level > 69) Inf_oled_draw_line(X + 32, Y + 2, X + 32, Y + 6);
+	if (level > 79) Inf_oled_draw_line(X + 33, Y + 2, X + 33, Y + 6);
+	if (level > 89) Inf_oled_draw_line(X + 34, Y + 2, X + 34, Y + 6);
+
+	if (level > 99)
+	{
+		Inf_oled_draw_line(X + 35, Y + 2, X + 35, Y + 6);
+		Inf_oled_show_num(X + 5, Y + 1, 100, 3, OLED_6X8);
+	}
+	else
+	{
+		Inf_oled_show_num(X + 11, Y + 1, level, 2, OLED_6X8);
+	}
 }

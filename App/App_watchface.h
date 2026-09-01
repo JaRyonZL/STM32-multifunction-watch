@@ -14,6 +14,7 @@ void App_watchface_show_time(uint8_t X, uint8_t Y);    /* ´óÊı×ÖÊ±¼ä£ºAM/PM+Ê±:·
 void App_watchface_date(uint8_t X, uint8_t Y);         /* ÈÕÆÚ£ºÄê/ÔÂ/ÈÕ£¨Ô­biaopan_date£¬¸´ÓÃshow_time¶ÁÈ¡µÄRTCÖµ£© */
 void App_watchface_week(uint8_t X, uint8_t Y);         /* ĞÇÆÚ£º"week:"+Êı×Ö£¨Ô­biaopan_week£¬ÖÜÈÕÏÔÊ¾R£© */
 void App_watchface_show_app_status(uint8_t X, uint8_t Y);  /* APP×´Ì¬Í¼±ê£¨Ô­biaopan_APP£©£ºMP3ÉÏµç/Ìå¸Ğ */
-void App_watchface_run(void);                          /* ±íÅÌË¢ĞÂÈë¿Ú£¨Ô­biaopan£¬C4²¹µçÁ¿ÏÔÊ¾ºóÓë¾ÉÍêÈ«Ò»ÖÂ£© */
+void App_watchface_show_battery(uint8_t X, uint8_t Y); /* µç³ØµçÁ¿Í¼±êÓë°Ù·Ö±È£¨Ô­biaopan_bydÏÔÊ¾²¿·Ö£¬Êı¾İÓÉInf_batteryÌá¹©£© */
+void App_watchface_run(void);                          /* ±íÅÌË¢ĞÂÈë¿Ú£¨Ô­biaopan£¬Óë¾É¹¤³ÌÏÔÊ¾ÄÚÈİÒ»ÖÂ£© */
 
 #endif
