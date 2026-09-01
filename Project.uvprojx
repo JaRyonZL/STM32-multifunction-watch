@@ -846,6 +846,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_key.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_battery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_battery.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_battery.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_battery.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
