@@ -25,6 +25,10 @@ void Inf_rtc_init(void)
 	{
 		Inf_rtc_set_time();
 	}
+
+#if !DRV_RTC_USE_LSE
+	Inf_rtc_calibrate_lsi();    /* LSI走时校准（依赖Drv_tim2已初始化） */
+#endif
 }
 
 /**
@@ -80,4 +84,45 @@ void Inf_rtc_read_time(void)
 	{
 		Inf_rtc_time[6]--;
 	}
+}
+
+
+/**
+  * 函    数：Inf_rtc_calibrate_lsi
+  * 功    能：LSI走时校准：用TIM2心跳（HSE派生）实测一个RTC秒的真实时长，
+  *           推算LSI实际频率并重设分频，使走时精度对齐HSE
+  * 说    明：仅LSI模式调用；依赖Drv_tim2已初始化；超时放弃则保持原分频
+  */
+static void Inf_rtc_calibrate_lsi(void)
+{
+	uint32_t us_start, us_end;
+	uint32_t us_wait;
+	uint32_t counter;
+	float lsi_actual;
+
+	// 等待RTC秒跳变作为测量起点（2s超时放弃）
+	counter = Drv_rtc_get_counter();
+	us_wait = Drv_tim2_get_us();
+	while (Drv_rtc_get_counter() == counter)
+	{
+		if (Drv_tim2_get_us() - us_wait > 2000000UL) { return; }
+	}
+	us_start = Drv_tim2_get_us();
+
+	// 再等一个秒跳变，实测一个RTC秒的真实时长
+	counter = Drv_rtc_get_counter();
+	us_wait = Drv_tim2_get_us();
+	while (Drv_rtc_get_counter() == counter)
+	{
+		if (Drv_tim2_get_us() - us_wait > 2000000UL) { return; }
+	}
+	us_end = Drv_tim2_get_us();
+
+	if (us_end == us_start) { return; }   // 防除零
+
+	// 实际LSI频率 = 当前分频值 / 实测秒时长（微秒）
+	lsi_actual = (float)(Drv_rtc_get_prescaler() + 1) * 1000000.0f / (float)(us_end - us_start);
+
+	// 重设分频（四舍五入），RTC秒与HSE对齐
+	Drv_rtc_set_prescaler((uint32_t)(lsi_actual + 0.5f) - 1);
 }
