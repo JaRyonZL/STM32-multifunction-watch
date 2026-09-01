@@ -3,6 +3,7 @@
 #include "Inf_oled_gfx.h"
 #include "Inf_key.h"
 #include "Com_oled_res.h"
+#include "App_watchface.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -419,7 +420,6 @@ void App_font_browser(void) {}
 void App_settings_run(void) {}
 void App_flashlight(void) {}
 void App_error(void) {}
-void App_watchface_time_adjust(void) {}
 
 /**
   * 函    数：App_menu_main_wheel
