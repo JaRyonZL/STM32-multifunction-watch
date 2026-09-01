@@ -1,6 +1,7 @@
 #include "Inf_key.h"
 #include "Com_board.h"
 #include "Drv_gpio.h"
+#include "Drv_tim.h"
 
 /******************************************************************************
  * 文件名称：Inf_key.c（接口层）
@@ -206,32 +207,49 @@ int8_t Inf_key_enter_event(uint8_t key_state)
 }
 
 /**
- * 函    数：Inf_key_scan
- * 功    能：按键扫描，统一1ms周期调用
- * 说    明：1ms周期执行，长按返回2后须松开才能再次响应
- */
+  * 函    数：Inf_key_scan
+  * 功    能：按键扫描，统一1ms周期调用
+  * 说    明：由TIM2的1ms计数计算距上次调用的毫秒差，按差值补齐执行次数
+  *           （封顶100ms），保证慢界面下按键计时依然准确；
+  *           返回批量中首个事件：1=上 2=下 3=确定短按 4=确定长按
+  */
 int8_t Inf_key_scan(void)
 {
-	uint8_t state = Inf_key_get_state();
+	static uint32_t last_tick = 0;          /* 上次扫描时刻 */
+	uint32_t now = Drv_tim2_get_tick();
+	uint32_t elapsed = now - last_tick;     /* 距上次的毫秒数（无符号回绕安全） */
+	last_tick = now;
 
-	if (Inf_key_up_event(state))
+	if (elapsed == 0) { elapsed = 1; }      /* 调用快于1ms时按1次处理 */
+	if (elapsed > 100) { elapsed = 100; }   /* 封顶，防止长时间未扫描后补跑过多 */
+
+	int8_t first_event = 0;                 /* 批量中首个事件 */
+
+	while (elapsed--)
 	{
-		return 1; // 上键
-	}
-	if (Inf_key_down_event(state))
-	{
-		return 2; // 下键
+		uint8_t state = Inf_key_get_state();
+
+		if (Inf_key_up_event(state))
+		{
+			if (first_event == 0) first_event = 1;
+			continue;
+		}
+		if (Inf_key_down_event(state))
+		{
+			if (first_event == 0) first_event = 2;
+			continue;
+		}
+
+		uint8_t enter_state = Inf_key_enter_event(state);
+		if (enter_state == 1)
+		{
+			if (first_event == 0) first_event = 3;
+		}
+		else if (enter_state == 2)
+		{
+			if (first_event == 0) first_event = 4;
+		}
 	}
 
-	uint8_t enter_state = Inf_key_enter_event(state);
-	if (enter_state == 1)
-	{
-		return 3; // 确认键短按
-	}
-	else if (enter_state == 2)
-	{
-		return 4; // 确认键长按
-	}
-
-	return 0;
+	return first_event;
 }
