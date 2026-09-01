@@ -1,5 +1,6 @@
 #include "Inf_oled_gfx.h"
 #include "Inf_oled.h"
+#include "Com_oled_res.h"
 #include <math.h>
 
 /******************************************************************************
@@ -501,6 +502,327 @@ void Inf_oled_draw_arc(uint8_t X, uint8_t Y, uint8_t Radius, int16_t StartAngle,
 			{
 				if (Inf_oled_is_in_angle(-y, j, StartAngle, EndAngle)) {Inf_oled_draw_point(X - y, Y + j);}
 				if (Inf_oled_is_in_angle(y, j, StartAngle, EndAngle)) {Inf_oled_draw_point(X + y, Y + j);}
+			}
+		}
+	}
+}
+
+
+/******************************************************************************
+ * 显示函数（字符/数字/字符串/中文/图片）
+ ******************************************************************************/
+
+/**
+  * 函    数：x的y次方
+  * 参    数：X 底数
+  * 参    数：Y 指数
+  * 返 回 值：计算结果
+  */
+uint32_t Inf_oled_pow(uint32_t X, uint32_t Y)
+{
+	uint32_t Result = 1;
+
+	while (Y--)
+	{
+		Result *= X;
+	}
+
+	return Result;
+}
+
+/**
+  * 函    数：显示一个字符
+  * 参    数：X,Y 字符左上角坐标
+  * 参    数：Char 要显示的字符（ASCII可见字符）
+  * 参    数：FontSize 字体大小（OLED_8X16/OLED_6X8）
+  * 返 回 值：无
+  */
+void Inf_oled_show_char(int8_t X, int8_t Y, char Char, uint8_t FontSize)
+{
+	if (FontSize == OLED_8X16)
+	{
+		Inf_oled_show_image(X, Y, 8, 16, OLED_F8x16[Char - ' ']);
+	}
+	else if (FontSize == OLED_6X8)
+	{
+		Inf_oled_show_image(X, Y, 6, 8, OLED_F6x8[Char - ' ']);
+	}
+}
+
+/**
+  * 函    数：显示ASCII字符串
+  * 参    数：X,Y 字符串左上角坐标
+  * 参    数：String 字符串（ASCII字符组成）
+  * 参    数：FontSize 字体大小
+  * 返 回 值：无
+  */
+void Inf_oled_show_ascii(int8_t X, int8_t Y, char* String, uint8_t FontSize)
+{
+	uint8_t i;
+
+	for (i = 0; String[i] != '\0'; i++)
+	{
+		Inf_oled_show_char(X + i * FontSize, Y, String[i], FontSize);
+	}
+}
+
+/**
+  * 函    数：显示十进制无符号数
+  * 参    数：X,Y 左上角坐标
+  * 参    数：Number 要显示的数（0~4294967295）
+  * 参    数：Length 长度（0~10）
+  * 参    数：FontSize 字体大小
+  * 返 回 值：无
+  */
+void Inf_oled_show_num(int8_t X, int8_t Y, uint32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i;
+
+	if (X > 127) {return;}
+	if (Y > 64) {return;}
+
+	for (i = 0; i < Length; i++)
+	{
+		Inf_oled_show_char(X + i * FontSize, Y, Number / Inf_oled_pow(10, Length - i - 1) % 10 + '0', FontSize);
+	}
+}
+
+/**
+  * 函    数：显示十进制有符号数
+  * 参    数：X,Y 左上角坐标
+  * 参    数：Number 要显示的数（-2147483648~2147483647）
+  * 参    数：Length 长度（0~10）
+  * 参    数：FontSize 字体大小
+  * 返 回 值：无
+  */
+void Inf_oled_show_signed_num(uint8_t X, uint8_t Y, int32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i;
+	uint32_t Number1;
+
+	if (Number >= 0)
+	{
+		Inf_oled_show_char(X, Y, '+', FontSize);
+		Number1 = Number;
+	}
+	else
+	{
+		Inf_oled_show_char(X, Y, '-', FontSize);
+		Number1 = -Number;
+	}
+
+	for (i = 0; i < Length; i++)
+	{
+		Inf_oled_show_char(X + (i + 1) * FontSize, Y, Number1 / Inf_oled_pow(10, Length - i - 1) % 10 + '0', FontSize);
+	}
+}
+
+/**
+  * 函    数：显示十六进制数
+  * 参    数：X,Y 左上角坐标
+  * 参    数：Number 要显示的数（0x00000000~0xFFFFFFFF）
+  * 参    数：Length 长度（0~8）
+  * 参    数：FontSize 字体大小
+  * 返 回 值：无
+  */
+void Inf_oled_show_hex_num(uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i, SingleNumber;
+
+	for (i = 0; i < Length; i++)
+	{
+		SingleNumber = Number / Inf_oled_pow(16, Length - i - 1) % 16;
+
+		if (SingleNumber < 10)
+		{
+			Inf_oled_show_char(X + i * FontSize, Y, SingleNumber + '0', FontSize);
+		}
+		else
+		{
+			Inf_oled_show_char(X + i * FontSize, Y, SingleNumber - 10 + 'A', FontSize);
+		}
+	}
+}
+
+/**
+  * 函    数：显示二进制数
+  * 参    数：X,Y 左上角坐标
+  * 参    数：Number 要显示的数
+  * 参    数：Length 长度（0~16）
+  * 参    数：FontSize 字体大小
+  * 返 回 值：无
+  */
+void Inf_oled_show_bin_num(uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, uint8_t FontSize)
+{
+	uint8_t i;
+
+	for (i = 0; i < Length; i++)
+	{
+		Inf_oled_show_char(X + i * FontSize, Y, Number / Inf_oled_pow(2, Length - i - 1) % 2 + '0', FontSize);
+	}
+}
+
+/**
+  * 函    数：显示浮点数
+  * 参    数：X,Y 左上角坐标
+  * 参    数：Number 要显示的数（-4294967295.0~4294967295.0）
+  * 参    数：IntLength 整数位长度（0~10）
+  * 参    数：FraLength 小数位长度（0~9，小数部分四舍五入）
+  * 参    数：FontSize 字体大小
+  * 返 回 值：无
+  */
+void Inf_oled_show_float_num(uint8_t X, uint8_t Y, double Number, uint8_t IntLength, uint8_t FraLength, uint8_t FontSize)
+{
+	uint32_t PowNum, IntNum, FraNum;
+
+	if (Number >= 0)
+	{
+		Inf_oled_show_char(X, Y, '+', FontSize);
+	}
+	else
+	{
+		Inf_oled_show_char(X, Y, '-', FontSize);
+		Number = -Number;
+	}
+
+	IntNum = Number;
+	Number -= IntNum;
+	PowNum = Inf_oled_pow(10, FraLength);
+	FraNum = round(Number * PowNum);
+	IntNum += FraNum / PowNum;		/* 小数进位 */
+
+	Inf_oled_show_num(X + FontSize, Y, IntNum, IntLength, FontSize);
+	Inf_oled_show_char(X + (IntLength + 1) * FontSize, Y, '.', FontSize);
+	Inf_oled_show_num(X + (IntLength + 2) * FontSize, Y, FraNum, FraLength, FontSize);
+}
+
+/**
+  * 函    数：显示中文（内置12x12字模查表）
+  * 参    数：X,Y 左上角坐标
+  * 参    数：Chinese 中文字符串（全部为汉字或全角字符）
+  * 返 回 值：无
+  * 说    明：未找到字模时显示默认图形（一般为方框问号）
+  */
+void Inf_oled_show_chinese(uint8_t X, uint8_t Y, char* Chinese)
+{
+	uint8_t pChinese = 0;
+	uint8_t pIndex;
+	uint8_t i;
+	char SingleChinese[OLED_CHN_CHAR_WIDTH + 1] = {0};
+
+	for (i = 0; Chinese[i] != '\0'; i++)
+	{
+		SingleChinese[pChinese] = Chinese[i];
+		pChinese++;
+
+		if (pChinese >= OLED_CHN_CHAR_WIDTH)
+		{
+			pChinese = 0;
+
+			for (pIndex = 0; strcmp(OLED_CF12x12[pIndex].Index, "") != 0; pIndex++)
+			{
+				if (strcmp(OLED_CF12x12[pIndex].Index, SingleChinese) == 0)
+				{
+					break;
+				}
+			}
+
+			Inf_oled_show_image(X + ((i + 1) / OLED_CHN_CHAR_WIDTH - 1) * 16, Y, 12, 12, OLED_CF12x12[pIndex].Data);
+		}
+	}
+}
+
+/**
+  * 函    数：显示图片
+  * 参    数：X,Y 图片左上角坐标（支持负坐标，只显示屏幕内部分）
+  * 参    数：Width,Height 图片宽高
+  * 参    数：Image 图片数据（页式布局，1bit/像素）
+  * 返 回 值：无
+  */
+void Inf_oled_show_image(int8_t X, int8_t Y0, uint8_t Width, uint8_t Height, const uint8_t* Image)
+{
+	int8_t Y = (int8_t)Y0;
+
+	uint8_t i, j, p = 1;
+
+	if (X + Width <= 0) {return;}
+	else if (X > 127) {return;}
+
+	uint8_t k = 0, l = 0, temp_Height;
+
+	if (Y < 0)
+	{
+		temp_Height = Height;
+		Height += Y;
+		k = (-Y - 1) / 8 + 1;
+		l = (-Y - 1) % 8 + 1;
+		Y = 0;
+
+		if ((int8_t)Height < 1)
+		{
+			return;
+		}
+	}
+	else if (Y > 63)
+	{
+		return;
+	}
+
+	/* 先清空图片区域 */
+	Inf_oled_clear_area(X, Y, Width, Height);
+
+	uint8_t Height_ceil = (Height - 1) / 8 + 1;
+
+	for (j = 0; j < Height_ceil; j++)
+	{
+		p = 1;
+
+		for (i = 0; i < Width; i++)
+		{
+			if (p)
+			{
+				if (X < 0)
+				{
+					i = i + (0 - X);
+					p = 0;
+				}
+			}
+
+			if (X + i > 127)
+			{
+				break;
+			}
+			if (Y / 8 + j > 7)
+			{
+				return;
+			}
+
+			if (k)
+			{
+				/* 显示上一Byte图片在当前页的部分 */
+				Inf_oled_display_buf[Y / 8 + j][X + i] |= Image[(j + k - 1) * Width + i] >> ((l));
+
+				/* 使用continue：当前Byte越界时，下一Byte的剩余数据还需要显示 */
+				if ((j + k) * 8 >= temp_Height)
+				{
+					continue;
+				}
+
+				/* 显示当前Byte图片在当前页的部分 */
+				Inf_oled_display_buf[Y / 8 + j][X + i] |= Image[(j + k) * Width + i] << (8 - (l));
+			}
+			else
+			{
+				/* 显示图片在当前页的部分 */
+				Inf_oled_display_buf[Y / 8 + j][X + i] |= Image[(j) * Width + i] << ((Y) % 8);
+
+				if (Y / 8 + j + 1 > 7)
+				{
+					continue;
+				}
+
+				/* 显示图片在下一页的部分 */
+				Inf_oled_display_buf[Y / 8 + j + 1][X + i] |= Image[(j) * Width + i] >> (8 - (Y) % 8);
 			}
 		}
 	}

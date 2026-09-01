@@ -23,4 +23,19 @@ void Inf_oled_draw_ellipse(uint8_t X, uint8_t Y, uint8_t A, uint8_t B, uint8_t I
 void Inf_oled_draw_arc(uint8_t X, uint8_t Y, uint8_t Radius, int16_t StartAngle,
                        int16_t EndAngle, uint8_t IsFilled);                     /* 画圆弧 */
 
+
+/* FontSize参数取值 */
+#define OLED_8X16				8
+#define OLED_6X8				6
+
+uint32_t Inf_oled_pow(uint32_t X, uint32_t Y);                                  /* x的y次方 */
+void Inf_oled_show_char(int8_t X, int8_t Y, char Char, uint8_t FontSize);       /* 显示字符 */
+void Inf_oled_show_ascii(int8_t X, int8_t Y, char* String, uint8_t FontSize);   /* 显示ASCII字符串 */
+void Inf_oled_show_num(int8_t X, int8_t Y, uint32_t Number, uint8_t Length, uint8_t FontSize);          /* 十进制无符号数 */
+void Inf_oled_show_signed_num(uint8_t X, uint8_t Y, int32_t Number, uint8_t Length, uint8_t FontSize);  /* 十进制有符号数 */
+void Inf_oled_show_hex_num(uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, uint8_t FontSize);    /* 十六进制数 */
+void Inf_oled_show_bin_num(uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, uint8_t FontSize);    /* 二进制数 */
+void Inf_oled_show_float_num(uint8_t X, uint8_t Y, double Number, uint8_t IntLength, uint8_t FraLength, uint8_t FontSize); /* 浮点数 */
+void Inf_oled_show_chinese(uint8_t X, uint8_t Y, char* Chinese);                 /* 中文（内置字模查表） */
+void Inf_oled_show_image(int8_t X, int8_t Y, uint8_t Width, uint8_t Height, const uint8_t* Image);      /* 图片 */
 #endif

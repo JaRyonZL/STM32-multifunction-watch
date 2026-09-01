@@ -696,6 +696,16 @@
               <FileType>5</FileType>
               <FilePath>.\Com\Com_config.h</FilePath>
             </File>
+            <File>
+              <FileName>Com_oled_res.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Com\Com_oled_res.c</FilePath>
+            </File>
+            <File>
+              <FileName>Com_oled_res.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Com\Com_oled_res.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
