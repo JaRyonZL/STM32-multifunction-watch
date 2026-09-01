@@ -1,6 +1,7 @@
 #include "Inf_oled_gfx.h"
 #include "Inf_oled.h"
 #include "Com_oled_res.h"
+#include "Inf_font.h"
 #include <math.h>
 
 /******************************************************************************
@@ -826,4 +827,86 @@ void Inf_oled_show_image(int8_t X, int8_t Y0, uint8_t Width, uint8_t Height, con
 			}
 		}
 	}
+}
+
+
+/******************************************************************************
+ * 中英文混排显示与格式化打印
+ * 说明：中文走W25Q128的GB2312全字库（12x12，每字24字节），ASCII用内置6x8字模
+ ******************************************************************************/
+
+/**
+  * 函    数：显示字符串（中英文混排）
+  * 参    数：X,Y 字符串左上角坐标
+  * 参    数：String 字符串（GB2312编码，可混排中英文）
+  * 参    数：FontSize ASCII字号（OLED_6X8/OLED_8X16），汉字固定12x12
+  * 返 回 值：无
+  * 说    明：支持换行符，超宽自动折行；行距随字号（6x8行距8，8x16行距16）；
+  *           ASCII与12px汉字底部对齐（6x8下移4，8x16上移4）
+  */
+void Inf_oled_show_string(int8_t X, int8_t Y, char* String, uint8_t FontSize)
+{
+	uint8_t i;
+	uint8_t xpos = 0;
+	uint8_t SChinese[24];
+	uint8_t GB_L, GB_H;
+
+	for (i = 0; String[i] != '\0'; i++)
+	{
+		if (String[i] == '\n')             /* 换行 */
+		{
+			Y += (FontSize == OLED_8X16) ? 16 : 8;
+			xpos = 0;
+			continue;
+		}
+
+		if (String[i] > '~')                /* 双字节字符（GB2312编码） */
+		{
+			if (X + xpos + 12 > 128)        /* 超宽自动折行 */
+			{
+				Y += (FontSize == OLED_8X16) ? 16 : 8;
+				xpos = 0;
+			}
+
+			GB_H = String[i];
+			i++;
+			GB_L = String[i];
+
+			Inf_font_read_gb2312(GB_H, GB_L, SChinese);
+			Inf_oled_show_image(X + xpos, Y, 12, 12, SChinese);
+
+			xpos += 12;
+		}
+		else                                /* ASCII字符 */
+		{
+			if (X + xpos + FontSize > 128)  /* 超宽自动折行 */
+			{
+				Y += (FontSize == OLED_8X16) ? 16 : 8;
+				xpos = 0;
+			}
+
+			Inf_oled_show_char(X + xpos, Y + ((FontSize == OLED_8X16) ? -4 : 4), String[i], FontSize);
+
+			xpos += FontSize;
+		}
+	}
+}
+
+/**
+  * 函    数：格式化字符串显示
+  * 参    数：X,Y 左上角坐标
+  * 参    数：FontSize ASCII字号
+  * 参    数：format 格式化字符串
+  * 返 回 值：无
+  */
+void Inf_oled_printf(uint8_t X, uint8_t Y, uint8_t FontSize, char* format, ...)
+{
+	char String[30];
+	va_list arg;
+
+	va_start(arg, format);
+	vsprintf(String, format, arg);
+	va_end(arg);
+
+	Inf_oled_show_string(X, Y, String, FontSize);
 }

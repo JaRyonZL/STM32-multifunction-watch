@@ -38,4 +38,7 @@ void Inf_oled_show_bin_num(uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length
 void Inf_oled_show_float_num(uint8_t X, uint8_t Y, double Number, uint8_t IntLength, uint8_t FraLength, uint8_t FontSize); /* 浮点数 */
 void Inf_oled_show_chinese(uint8_t X, uint8_t Y, char* Chinese);                 /* 中文（内置字模查表） */
 void Inf_oled_show_image(int8_t X, int8_t Y, uint8_t Width, uint8_t Height, const uint8_t* Image);      /* 图片 */
+
+void Inf_oled_show_string(int8_t X, int8_t Y, char* String, uint8_t FontSize);
+void Inf_oled_printf(uint8_t X, uint8_t Y, uint8_t FontSize, char* format, ...);
 #endif
