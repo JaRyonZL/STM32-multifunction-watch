@@ -213,3 +213,73 @@ void App_watchface_show_battery(uint8_t X, uint8_t Y)
 		Inf_oled_show_num(X + 11, Y + 1, level, 2, OLED_6X8);
 	}
 }
+
+/**
+  * 函    数：App_watchface_time_adjust
+  * 功    能：时间调整界面：上下键修改年/月/日/时/分/秒，短按确定逐项切换，
+  *           6项完成后写入RTC并返回
+  * 说    明：只响应短按确定
+  */
+void App_watchface_time_adjust(void)
+{
+	uint8_t field_index = 0;    /* 当前编辑字段：0=年 1=月 2=日 3=时 4=分 5=秒 */
+	uint16_t value;
+
+	Inf_oled_fade_flag = 1;
+
+	while (1)
+	{
+		uint8_t key = Inf_key_scan();   /* 获取按键事件 */
+
+		Inf_oled_clear();
+
+		Inf_oled_show_num(6, 5, Inf_rtc_time[0], 4, OLED_6X8);
+		Inf_oled_show_num(41, 5, Inf_rtc_time[1], 2, OLED_6X8);
+		Inf_oled_show_num(66, 5, Inf_rtc_time[2], 2, OLED_6X8);
+		Inf_oled_show_num(6, 20, Inf_rtc_time[3], 2, OLED_6X8);
+		Inf_oled_show_num(31, 20, Inf_rtc_time[4], 2, OLED_6X8);
+		Inf_oled_show_num(56, 20, Inf_rtc_time[5], 2, OLED_6X8);
+
+		/* 当前编辑字段的"-"指示 */
+		switch (field_index)
+		{
+			case 0: Inf_oled_show_ascii(0, 5, "-", OLED_6X8); break;
+			case 1: Inf_oled_show_ascii(35, 5, "-", OLED_6X8); break;
+			case 2: Inf_oled_show_ascii(60, 5, "-", OLED_6X8); break;
+			case 3: Inf_oled_show_ascii(0, 20, "-", OLED_6X8); break;
+			case 4: Inf_oled_show_ascii(25, 20, "-", OLED_6X8); break;
+			case 5: Inf_oled_show_ascii(50, 20, "-", OLED_6X8); break;
+		}
+
+		Inf_oled_update();
+
+		Inf_oled_gradient(1);
+
+		if (key == 1)               /* 上键：当前字段+1 */
+		{
+			value = Inf_rtc_time[field_index];
+			value++;
+			Inf_rtc_time[field_index] = value;
+		}
+		else if (key == 2)          /* 下键：当前字段-1 */
+		{
+			value = Inf_rtc_time[field_index];
+			value--;
+			Inf_rtc_time[field_index] = value;
+		}
+
+		if (key == 3)               /* 短按确定：切换到下一字段，6项完成后写入RTC返回 */
+		{
+			field_index++;
+			if (field_index >= 6)
+			{
+				Inf_rtc_set_time();
+
+				Inf_oled_fade_flag = 1;
+				Inf_oled_gradient(0);
+
+				return;
+			}
+		}
+	}
+}

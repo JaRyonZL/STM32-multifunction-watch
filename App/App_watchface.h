@@ -16,5 +16,6 @@ void App_watchface_week(uint8_t X, uint8_t Y);
 void App_watchface_show_app_status(uint8_t X, uint8_t Y);  
 void App_watchface_show_battery(uint8_t X, uint8_t Y); 
 void App_watchface_run(void);                          
+void App_watchface_time_adjust(void);
 
 #endif
