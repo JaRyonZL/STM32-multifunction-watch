@@ -8,6 +8,7 @@
 #include "App_mp3.h"
 #include "App_video.h"
 #include "App_game.h"
+#include "App_menu_data.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -417,7 +418,6 @@ void App_qrcode_wechat(void) {}
 void App_qrcode_zfb(void) {}
 void App_calc_cos(void) {}
 void App_font_browser(void) {}
-void App_settings_run(void) {}
 void App_flashlight(void) {}
 void App_error(void) {}
 
