@@ -411,16 +411,6 @@ void App_menu_run_wheel(App_menu_option1_t* option)
 	}
 }
 
-/******************************************************************************
- * 应用入口占位函数（C3~C13迁移对应模块后删除，改用各App模块真实实现）
- ******************************************************************************/
-void App_qrcode_wechat(void) {}
-void App_qrcode_zfb(void) {}
-void App_calc_cos(void) {}
-void App_font_browser(void) {}
-void App_flashlight(void) {}
-void App_error(void) {}
-
 /**
   * 函    数：App_menu_main_wheel
   * 功    能：表盘轮盘菜单入口（旧工程main_menu1迁移）
