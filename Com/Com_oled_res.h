@@ -76,6 +76,8 @@ extern const uint8_t APPVIDEO[];
 extern const uint8_t APPYYBFsmall[];
 extern const uint8_t APPTLYsmall[];
 extern const uint8_t APP8266small[];
+extern const uint8_t qrcode_wechat_img[];
+extern const uint8_t qrcode_zfb_img[];
 
 /*按照上面的格式，在这个位置加入新的图像数据声明*/
 //...
