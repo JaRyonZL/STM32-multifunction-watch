@@ -20,16 +20,28 @@ static uint8_t s_rx_index = 0;    /* 包内数据写入位置 */
 static uint8_t s_rx_packet[9];    /* 包头0xFF后的9字节数据 */
 static uint8_t s_rx_flag = 0;     /* 收包完成标志 */
 
+
+/**
+  * 函   数：Inf_mp3_detect_init
+  * 功   能：电源检测输入初始化（仅初始化PA11为下拉输入）
+  * 说明  ：不初始化PA12。模块未上电时若PA12被驱动为高，会经ESD二极管
+  *          向模块漏电使PA11拉高，导致电源检测误判为上电
+  */
+void Inf_mp3_detect_init(void)
+{
+	Drv_GPIO_Init(MP3_PWR_DET_PORT, MP3_PWR_DET_PIN, GPIO_FK_IN, GPIO_P_DOWN, GPIO_50MHz);
+}
+
 /**
   * 函    数：Inf_mp3_init
   * 功    能：功放使能脚默认关闭、电源检测输入、串口初始化
   */
 void Inf_mp3_init(void)
 {
+	Inf_mp3_detect_init();
+
 	Drv_GPIO_Init(MP3_AMP_EN_PORT, MP3_AMP_EN_PIN, GPIO_TW_OUT, GPIO_P_NO, GPIO_50MHz);
 	GPIO_SetBits(MP3_AMP_EN_PORT, MP3_AMP_EN_PIN);  /* 默认关闭功放 */
-
-	Drv_GPIO_Init(MP3_PWR_DET_PORT, MP3_PWR_DET_PIN, GPIO_FK_IN, GPIO_P_DOWN, GPIO_50MHz);
 
 	Drv_uart_init(&Drv_uart2);
 }
@@ -41,6 +53,7 @@ void Inf_mp3_init(void)
 void Inf_mp3_power_off(void)
 {
 	GPIO_SetBits(MP3_AMP_EN_PORT, MP3_AMP_EN_PIN);
+	Drv_GPIO_Init(MP3_AMP_EN_PORT, MP3_AMP_EN_PIN, GPIO_FK_IN, GPIO_P_NO, GPIO_50MHz);  /* PA12改浮空输入，防漏电拉高PA11 */
 	Drv_uart_power_off(&Drv_uart2);
 }
 

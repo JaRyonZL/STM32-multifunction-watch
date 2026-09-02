@@ -28,6 +28,7 @@ typedef struct
 
 extern Inf_mp3_state_t Inf_mp3;       /* MP3状态 */
 
+void Inf_mp3_detect_init(void);          /* 电源检测初始化（仅PA11输入，不驱动PA12） */
 void Inf_mp3_init(void);                 /* 初始化：功放使能默认关+电源检测输入+串口 */
 void Inf_mp3_power_off(void);            /* 断电：关功放+串口断电 */
 void Inf_mp3_send_cmd(uint8_t CMD, uint8_t feedback, uint16_t data);  /* 发送协议帧 */
