@@ -10,7 +10,7 @@
  ******************************************************************************/
 
 #define KEY_DEBOUNCE 20			// 消抖阈值(ms)
-#define KEY_LONG_THRESHOLD 2000 // 长按阈值(ms)
+#define KEY_LONG_THRESHOLD 1000 // 长按阈值(ms)
 
 static uint8_t up_act = 0;
 static uint16_t up_deb_cnt; // 上键单击标志与消抖计数
@@ -89,7 +89,7 @@ int8_t Inf_key_up_event(uint8_t key_state)
 		else
 		{
 			// 触发了单击时仍检测到按下 => 触发连击
-			if (++up_hold_cnt >= (up_hold_first ? 150 : 10))
+			if (++up_hold_cnt >= (up_hold_first ? 200 : 100))
 			{
 				// 首次连发需要经过150ms，其他只需10ms
 				up_hold_cnt = 0;
@@ -137,7 +137,7 @@ int8_t Inf_key_down_event(uint8_t key_state)
 		else
 		{
 			// 触发了单击时仍检测到按下 => 触发连击
-			if (++down_hold_cnt >= (down_hold_first ? 150 : 10))
+			if (++down_hold_cnt >= (down_hold_first ? 200 : 100))
 			{
 				// 首次连发需要经过150ms，其他只需10ms
 				down_hold_cnt = 0;
