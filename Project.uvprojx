@@ -921,6 +921,16 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_mp3.h</FilePath>
             </File>
+            <File>
+              <FileName>App_video.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_video.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_video.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_video.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
