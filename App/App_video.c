@@ -262,40 +262,35 @@ static void App_video_write(uint32_t address)
 	}
 }
 
+
 /**
-  * 函   数：App_video_write_first
-  * 功   能：录制第一段（旧工程 VIDEO_write_miku，先解锁写保护）
+  * 函   数：App_video_show_tip
+  * 功   能：提示信息显示，500ms 后渐变灭退出
   */
-void App_video_write_first(void)
+static void App_video_show_tip(char* str)
 {
-	Inf_w25q_write_status();     /* 取消写保护 */
-	App_video_write(APP_VIDEO_BASE_ADDRESS);
+	Inf_oled_clear();
+	Inf_oled_show_string(0, 20, str, OLED_6X8);
+	Inf_oled_update();
+	Drv_delay_ms(500);
+	Inf_oled_fade_flag = 1;
+	Inf_oled_gradient(0);
 }
 
 /**
-  * 函   数：App_video_write_second
-  * 功   能：录制第二段（旧工程 VIDEO_write_CXUK）
+  * 函   数：App_video_erase_old
+  * 功   能：烧录前擦除旧视频数据区（按旧文件头帧数算扇区数，
+  *          W25Q 编程只能1->0，重复烧录必须先擦除）
   */
-void App_video_write_second(void)
+static void App_video_erase_old(uint32_t address)
 {
-	App_video_write(App_video_next_site(APP_VIDEO_BASE_ADDRESS));
-}
-
-/**
-  * 函   数：App_video_write_third
-  * 功   能：录制第三段（旧工程 VIDEO_write_custom，先擦除旧数据）
-  */
-void App_video_write_third(void)
-{
-	uint8_t temp[3];      /* 文件头(3字节) */
-	uint32_t data, pdata = 0;
+	uint8_t temp[3];
+	uint32_t pdata = 0;
 	uint32_t mydata = 0;
 
-	data = (App_video_next_site(App_video_next_site(APP_VIDEO_BASE_ADDRESS)) + 4096);
+	Inf_w25q_read_data(address, temp, 3);
 
-	Inf_w25q_read_data(data, temp, 3);
-
-	if (temp[0] == 0xAA) /* 已有文件 */
+	if (temp[0] == 0xAA) /* 已有文件：按旧帧数擦除 */
 	{
 		mydata = (temp[2] << 8) | temp[1];  /* 获取总帧数 */
 		mydata = (mydata + 3) / 4 + 1;      /* 需要擦除的扇区数(向上取整再+1) */
@@ -309,13 +304,71 @@ void App_video_write_third(void)
 
 		while (pdata < mydata)
 		{
-			Inf_w25q_sector_erase(data + (pdata * 4096));
+			Inf_w25q_sector_erase(address + (pdata * 4096));
 			pdata++;
 		}
 	}
+}
 
+/**
+  * 函   数：App_video_write_first
+  * 功   能：烧录第一段视频
+  */
+void App_video_write_first(void)
+{
+	Inf_w25q_write_status();     /* 取消写保护 */
+	App_video_erase_old(APP_VIDEO_BASE_ADDRESS);
+	App_video_write(APP_VIDEO_BASE_ADDRESS);
+}
+
+/**
+  * 函   数：App_video_write_second
+  * 功   能：烧录第二段视频
+  */
+void App_video_write_second(void)
+{
+	uint32_t address = App_video_next_site(APP_VIDEO_BASE_ADDRESS);
+	uint8_t temp[3];
+
+	/* 第一个视频不存在时地址链失效 */
+	Inf_w25q_read_data(APP_VIDEO_BASE_ADDRESS, temp, 3);
+	if (temp[0] != 0xAA)
+	{
+		App_video_show_tip("请先烧录第一个视频");
+		return;
+	}
+
+	App_video_erase_old(address);
+	App_video_write(address);
+}
+
+/**
+  * 函   数：App_video_write_third
+  * 功   能：烧录第三段视频
+  */
+void App_video_write_third(void)
+{
+	uint32_t data = App_video_next_site(App_video_next_site(APP_VIDEO_BASE_ADDRESS)) + 4096;
+	uint8_t temp[3];
+
+	/* 前两个视频不存在时地址链失效 */
+	Inf_w25q_read_data(APP_VIDEO_BASE_ADDRESS, temp, 3);
+	if (temp[0] != 0xAA)
+	{
+		App_video_show_tip("请先烧录前两个视频");
+		return;
+	}
+	Inf_w25q_read_data(App_video_next_site(APP_VIDEO_BASE_ADDRESS), temp, 3);
+	if (temp[0] != 0xAA)
+	{
+		App_video_show_tip("请先烧录前两个视频");
+		return;
+	}
+
+	App_video_erase_old(data);
 	App_video_write(data);
 }
+
 
 /**
   * 函   数：App_video_erase
