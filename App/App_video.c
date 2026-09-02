@@ -1,4 +1,5 @@
 #include "App_video.h"
+#include "App_menu.h"
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
 #include "Inf_w25q.h"
@@ -392,4 +393,43 @@ void App_video_streaming(void)
 			return;
 		}
 	}
+}
+
+
+/**
+  * 函   数：App_video_write_menu
+  * 功   能：烧录子菜单（旧工程 menu_Data.c 的 VIDEO_write）
+  */
+static void App_video_write_menu(void)
+{
+	App_menu_option2_t option_list[] = {
+		{"- 返回"          , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,       0, 0},
+		{"- 烧录miku"      , APP_MENU_MODE_FUNCTION, App_video_write_first,  0, 0},
+		{"- 烧录rabbit hole", APP_MENU_MODE_FUNCTION, App_video_write_second, 0, 0},
+		{"- 烧录第三视频"  , APP_MENU_MODE_FUNCTION, App_video_write_third,  0, 0},
+		{"- 擦除所有视频"  , APP_MENU_MODE_FUNCTION, App_video_erase,        0, 0},
+		{".."}
+	};
+
+	App_menu_run_list(option_list);
+}
+
+/**
+  * 函   数：App_video_menu
+  * 功   能：视频菜单（旧工程 menu_Data.c 的 VIDEO）：三个播放入口+
+  *          烧录子菜单+串流
+  */
+void App_video_menu(void)
+{
+	App_menu_option2_t option_list[] = {
+		{"- 退出"        , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,      0, 0},
+		{"- miku"        , APP_MENU_MODE_FUNCTION, App_video_play_first,  0, 0},
+		{"- rabbit hole" , APP_MENU_MODE_FUNCTION, App_video_play_second, 0, 0},
+		{"- bad apple"   , APP_MENU_MODE_FUNCTION, App_video_play_third,  0, 0},
+		{"- 烧录"        , APP_MENU_MODE_FUNCTION, App_video_write_menu,  0, 0},
+		{"- 串流"        , APP_MENU_MODE_FUNCTION, App_video_streaming,   0, 0},
+		{".."}
+	};
+
+	App_menu_run_list(option_list);
 }

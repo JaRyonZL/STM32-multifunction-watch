@@ -19,4 +19,6 @@ void App_video_write_third(void);   /* 录制第三段视频（先擦除旧数据） */
 void App_video_erase(void);         /* 擦除视频区 */
 void App_video_streaming(void);     /* 串流显示（USART3帧数据直写显存） */
 
+void App_video_menu(void);         /* 视频菜单 */
+
 #endif
