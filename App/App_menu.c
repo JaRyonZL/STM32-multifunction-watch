@@ -6,6 +6,7 @@
 #include "App_watchface.h"
 #include "App_voltage.h"
 #include "App_mp3.h"
+#include "App_video.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -413,7 +414,6 @@ void App_menu_run_wheel(App_menu_option1_t* option)
  ******************************************************************************/
 void App_qrcode_wechat(void) {}
 void App_qrcode_zfb(void) {}
-void App_video_menu(void) {}
 void App_game_run(void) {}
 void App_calc_cos(void) {}
 void App_font_browser(void) {}
