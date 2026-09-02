@@ -5,6 +5,9 @@
 #include "Inf_battery.h"
 #include "Inf_key.h"
 #include "Drv_adc.h"
+#include "Drv_delay.h"
+#include "Inf_w25q.h"
+#include "Com_oled_res.h"
 
 /******************************************************************************
  * 文件名：App_menu_data.c（应用层）
@@ -220,6 +223,226 @@ static void App_settings_voltage_run(void)
 		else if (key == 2)
 		{
 			VIN = VIN - 0.01;
+		}
+
+		if (key == 3 || key == 4)
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+
+/**
+  * 函   数：App_error
+  * 功   能：占位界面：提示待开发，任意键退出
+  */
+void App_error(void)
+{
+	int8_t key;
+
+	Inf_oled_fade_flag = 1;
+
+	Inf_oled_clear();
+	Inf_oled_show_string(39, 16, "待开发中", OLED_6X8);
+	Inf_oled_show_string(0, 52, "当然你也可以自己来写", OLED_6X8);
+	Inf_oled_update();
+
+	while (1)
+	{
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key != 0)   /* 任意键退出 */
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+/**
+  * 函   数：App_flashlight
+  * 功   能：手电筒：全屏白 + 渐亮完成，任意键退出
+  */
+void App_flashlight(void)
+{
+	int8_t key;
+
+	Inf_oled_fade_flag = 1;
+
+	Inf_oled_clear();	/* 清屏 */
+	Inf_oled_draw_rectangle(0, 0, 128, 64, OLED_FILLED);/* 全屏白 */
+	Inf_oled_update();	/* 刷新屏幕 */
+
+	while (1)
+	{
+		while (Inf_oled_fade_flag) { Inf_oled_update(); Inf_oled_gradient(1); }   /* 渐亮直到完成 */
+
+		Inf_oled_write_command(0x81);	/* 设置对比度 */
+		Inf_oled_write_command(0xFF);	/* 0x00~0xFF */
+
+		key = Inf_key_scan();
+		if (key != 0)
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+/**
+  * 函   数：App_qrcode_wechat
+  * 功   能：微信收款码（占位图bug），确定键退出
+  */
+void App_qrcode_wechat(void)
+{
+	int8_t key;
+
+	Inf_oled_fade_flag = 1;
+
+	Inf_oled_clear();
+	Inf_oled_show_image(32, 0, 64, 64, bug);
+	Inf_oled_update();
+
+	while (1)
+	{
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key == 3 || key == 4)   /* 确定键：退出 */
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+/**
+  * 函   数：App_qrcode_zfb
+  * 功   能：支付宝收款码（占位图bug），确定键退出
+  */
+void App_qrcode_zfb(void)
+{
+	int8_t key;
+
+	Inf_oled_fade_flag = 1;
+
+	Inf_oled_clear();
+	Inf_oled_show_image(32, 0, 64, 64, bug);
+	Inf_oled_update();
+
+	while (1)
+	{
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key == 3 || key == 4)   /* 确定键：退出 */
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+/**
+  * 函   数：App_calc_cos
+  * 功   能：cos 计算器：cos 值与 asin/acos 换算角度显示，
+  *          上下键±0.001（短按确定切 ±0.01 步进），长按退出
+  */
+void App_calc_cos(void)
+{
+	int8_t key, i = 0;
+	float cos1 = 0, tpp, tpp1;
+
+	Inf_oled_fade_flag = 1;
+
+	Inf_oled_clear();
+
+	while (1)
+	{
+		tpp = asin(cos1);
+		tpp1 = acos(cos1);
+
+		Inf_oled_show_float_num(10, 10, cos1, 1, 3, OLED_6X8);
+		Inf_oled_show_float_num(10, 30, tpp / 3.141592 * 180, 2, 9, OLED_6X8);
+		Inf_oled_show_float_num(10, 40, tpp1 / 3.141592 * 180, 2, 9, OLED_6X8);
+		Inf_oled_update();
+
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key == 1)
+		{
+			if (i) cos1 += 0.01;
+			else cos1 += 0.001;
+		}
+		else if (key == 2)
+		{
+			if (i) cos1 -= 0.01;
+			else cos1 -= 0.001;
+		}
+
+		if (key == 3) { i = !i; }
+		else if (key == 4)
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+/**
+  * 函   数：App_font_browser
+  * 功   能：字库浏览：4×10 网格滚动显示 12x12 汉字，
+  *          上下键调滚动速度(dld±10)，确定键退出
+  */
+void App_font_browser(void)
+{
+	int8_t key;
+	uint8_t SChinese[24];
+	uint32_t Addr_offset = 0;   /* 汉字的偏移地址 */
+	uint16_t dld = 0;
+	uint8_t i, o;
+
+	Inf_oled_fade_flag = 1;
+
+	Inf_oled_clear();
+
+	while (1)
+	{
+		Inf_oled_clear();
+		for (i = 0; i < 4; i++)
+		{
+			for (o = 0; o < 10; o++)
+			{
+				Inf_w25q_read_data(Addr_offset, SChinese, 24);
+				Inf_oled_show_image(o * 12, i * 12, 12, 12, SChinese);
+				Inf_oled_update_area(o * 12, i * 12, 12, 12);
+				Addr_offset += 24;
+				Inf_oled_show_hex_num(0, 48, Addr_offset, 6, OLED_6X8);
+				Inf_oled_show_num(0, 56, Addr_offset, 8, OLED_6X8);
+				Inf_oled_update_area(0, 48, 48, 16);
+				Drv_delay_ms(dld);
+			}
+		}
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key == 1)
+		{
+			dld += 10;
+		}
+		else if (key == 2)
+		{
+			if (dld) dld -= 10;
 		}
 
 		if (key == 3 || key == 4)
