@@ -340,7 +340,7 @@ void App_qrcode_zfb(void) { App_qrcode_show(qrcode_zfb_img); }
 /**
   * 函   数：App_calc_cos
   * 功   能：cos 计算器（旧 cosjiaod）：cos 值与 asin/acos 换算角度显示，
-  *          上下键±0.001（短按确定切 ±0.01 步进），长按退出
+  *          上下键±0.01（短按确定切 ±0.01 步进），长按退出
   */
 void App_calc_cos(void)
 {
@@ -367,12 +367,12 @@ void App_calc_cos(void)
 		if (key == 1)
 		{
 			if (i) cos1 += 0.01;
-			else cos1 += 0.001;
+			else cos1 += 0.01;
 		}
 		else if (key == 2)
 		{
 			if (i) cos1 -= 0.01;
-			else cos1 -= 0.001;
+			else cos1 -= 0.01;
 		}
 
 		if (key == 3) { i = !i; }
