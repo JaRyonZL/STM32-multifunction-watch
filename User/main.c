@@ -1,9 +1,9 @@
 #include "stm32f10x.h"
 #include "Drv_delay.h"
-#include "Drv_adc.h"
 #include "Drv_tim.h"
+#include "Drv_adc.h"
+#include "Drv_pwr.h"
 #include "Inf_oled.h"
-#include "Inf_oled_gfx.h"
 #include "Inf_w25q.h"
 #include "Inf_battery.h"
 #include "Inf_rtc.h"
@@ -11,43 +11,100 @@
 #include "Inf_key.h"
 #include "App_menu.h"
 #include "App_watchface.h"
+#include "App_power.h"
 
-uint8_t TLYPW = 0;   /* ä½“æ„Ÿå¼€å…³çŠ¶æ€ï¼ˆé¢„ç•™ï¼‰ */
+uint8_t TLYPW = 0;             /* Ìå¸Ğ¿ª¹Ø×´Ì¬±êÖ¾Î»£¨MPU6050Ôİ»º£¬Ô¤Áô£© */
 
 int main(void)
 {
-	Drv_delay_init();
-	Inf_oled_init();
-	Inf_w25q_init();
-	Drv_adc1_init();
-	Inf_battery_init();
-	Drv_tim2_init();
-	Inf_rtc_init();
-	Inf_mp3_detect_init();
-	Inf_key_init();
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);   /* NVIC ·Ö×é2£¨ÏÈÓÚËùÓĞÖĞ¶Ï³õÊ¼»¯£© */
 
-	while (1)
+	Drv_delay_init();   /* ÑÓÊ±º¯Êı³õÊ¼»¯ */
+	Inf_oled_init();    /* OLED ÏÔÊ¾³õÊ¼»¯ */
+
+	Inf_oled_write_command(0x81);	/* ÉèÖÃ¶Ô±È¶È */
+	Inf_oled_write_command(0x00);	/* 0x00~0xFF */
+
+	Inf_w25q_init();    /* W25Q ×Ö¿â£¨ÖĞÎÄÏÔÊ¾ÒÀÀµ£¬ÄÚ²¿º¬SPI1£© */
+
+	Drv_tim2_init();    /* 1msĞÄÌø£¨ĞëÏÈÓÚRTC£¬½øĞĞLSIĞ£×¼£© */
+	Inf_rtc_init();     /* RTC³õÊ¼»¯ */
+    
+    Drv_adc1_init();
+	Inf_battery_init(); /* µç³Ø¼ì²â£¨ÄÚ²¿º¬JTAGÖØÓ³ÉäPB3/PB4/PA15£© */
+	Inf_key_init();     /* °´¼ü³õÊ¼»¯ */
+	Inf_mp3_detect_init();   /* MP3µçÔ´¼ì²âÊäÈë£¨Ôİ²»Çı¶¯PA12¹¦·ÅÊ¹ÄÜ£¬·ÀÂ©µçÀ­¸ßPA11£© */
+	Drv_pwr_wakeup_init();   /* PA0 EXTI0»½ĞÑ */
+
+	int8_t key;                      /* ´æ´¢°´¼üÊÂ¼şÖµ */
+	uint32_t idle_tick = Drv_tim2_get_tick();   /* ÉÏ´Î°´¼üÊ±¿Ì(ms)£¬10ÃëÎŞ²Ù×÷¹Ø»ú */
+
+	/* ¿ª»ú¶¯»­ */
+	Inf_oled_fade_flag = 1;
+	while (Inf_oled_fade_flag)
 	{
-		/* è¡¨ç›˜æ˜¾ç¤º */
-		Inf_oled_fade_flag = 1;
 		App_watchface_run();
 		Drv_delay_ms(4);
 		Inf_oled_gradient(1);
+	}
 
-		int8_t key = Inf_key_scan();
+	while (1)
+	{
+		App_watchface_run();   /* Ë¢ĞÂ±íÅÌ */
+		Inf_mp3_poll();        /* ´¦ÀíMP3Ä£¿é»Ø´«£¨0x3D ÇĞ¸èµÈ£© */
+		key = Inf_key_scan();  /* »ñÈ¡°´¼üÊÂ¼ş */
 
-		if (key == 1)       /* ä¸Šé”®ï¼šè¿›åˆ—è¡¨èœå•ï¼Œè¿”å›åè¿›è½®ç›˜èœå• */
+		if ((uint32_t)(Drv_tim2_get_tick() - idle_tick) > 10000)   /* 10ÃëÎŞ²Ù×÷¹Ø»ú */
 		{
-			Inf_oled_fade_flag = 1;
-			Inf_oled_gradient(0);
-			App_menu_main_list();
-			Inf_oled_fade_flag = 1;
+			key = 2;
+			idle_tick = Drv_tim2_get_tick();
+		}
 
+		if (key == 1)          /* ÉÏ¼ü£º½øÁĞ±í²Ëµ¥ */
+		{
+			idle_tick = Drv_tim2_get_tick();
 			Inf_oled_fade_flag = 1;
 			Inf_oled_gradient(0);
-			App_menu_main_wheel();
+
+			App_menu_main_list();
+			idle_tick = Drv_tim2_get_tick();   /* ·µ»Ø±íÅÌÖØĞÂ¼ÆÊ± */
+
 			Inf_oled_fade_flag = 1;
 		}
-		/* ä¸‹é”®ï¼šå…³æœº */
+		else if (key == 2)     /* ÏÂ¼ü£º¹Ø»ú£¨STOP ĞİÃß£¬PA0 »½ĞÑ»Ö¸´£© */
+		{
+			idle_tick = Drv_tim2_get_tick();
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+
+			App_power_off();
+			idle_tick = Drv_tim2_get_tick();   /* »½ĞÑ·µ»ØÖØĞÂ¼ÆÊ± */
+
+			Inf_oled_fade_flag = 1;
+		}
+
+		/* ½¥ÁÁÑ­»·£¨·ÀÖ¹¹Ø»úºóÁ¢¿ÌÎó´¥·¢°´¼ü£© */
+		while (Inf_oled_fade_flag)
+		{
+			App_watchface_run();
+			Drv_delay_ms(4);
+			Inf_oled_gradient(1);
+		}
+
+		if (key == 1)          /* ÉÏ¼ü£ºÔÙ½øÂÖÅÌ²Ëµ¥ */
+		{
+			idle_tick = Drv_tim2_get_tick();
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+
+			App_menu_main_wheel();
+			idle_tick = Drv_tim2_get_tick();   /* ·µ»Ø±íÅÌÖØĞÂ¼ÆÊ± */
+
+			Inf_oled_fade_flag = 1;
+		}
+		else if (key == 4)     /* ³¤°´È·¶¨£º´ı»ú£¨STANDBY£¬PA0 WKUP¸´Î»ÖØÆô£© */
+		{
+			App_power_standby();
+		}
 	}
 }
