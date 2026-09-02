@@ -11,6 +11,7 @@
 
 void App_watchface_draw_digit(uint8_t X, uint8_t Y, uint8_t Num, uint8_t Big);  
 void App_watchface_show_time(uint8_t X, uint8_t Y);  
+void App_watchface_time_small(uint8_t X, uint8_t Y);
 void App_watchface_date(uint8_t X, uint8_t Y);       
 void App_watchface_week(uint8_t X, uint8_t Y);       
 void App_watchface_show_app_status(uint8_t X, uint8_t Y);  

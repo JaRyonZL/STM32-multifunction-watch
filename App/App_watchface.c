@@ -284,3 +284,29 @@ void App_watchface_time_adjust(void)
 		}
 	}
 }
+
+/**
+  * 函    数：App_watchface_time_small
+  * 功    能：读取RTC并显示小字号时间：AM/PM+时:分:秒
+  */
+void App_watchface_time_small(uint8_t X, uint8_t Y)
+{
+	uint16_t hour;
+
+	Inf_rtc_read_time();
+
+	hour = Inf_rtc_time[3];
+	if (hour > 12)
+	{
+		hour = hour - 12;
+		Inf_oled_show_ascii(X + 42, Y, "PM", OLED_6X8);
+	}
+	else
+	{
+		Inf_oled_show_ascii(X + 42, Y, "AM", OLED_6X8);
+	}
+
+	Inf_oled_show_num(X, Y, hour, 2, OLED_6X8);
+	Inf_oled_show_num(X + 14, Y, Inf_rtc_time[4], 2, OLED_6X8);
+	Inf_oled_show_num(X + 28, Y, Inf_rtc_time[5], 2, OLED_6X8);
+}
