@@ -5,6 +5,7 @@
 #include "Com_oled_res.h"
 #include "App_watchface.h"
 #include "App_voltage.h"
+#include "App_mp3.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -410,7 +411,6 @@ void App_menu_run_wheel(App_menu_option1_t* option)
 /******************************************************************************
  * 应用入口占位函数（C3~C13迁移对应模块后删除，改用各App模块真实实现）
  ******************************************************************************/
-void App_mp3_run(void) {}
 void App_qrcode_wechat(void) {}
 void App_qrcode_zfb(void) {}
 void App_video_menu(void) {}
