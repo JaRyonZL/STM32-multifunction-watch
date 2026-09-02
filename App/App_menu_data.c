@@ -299,15 +299,25 @@ void App_flashlight(void)
 /**
   * 函   数：App_qrcode_show
   * 功   能：收款码占位显示，确定键退出
+  * 参   数：image 收款码图片数据
+  *         type 收款码类型：1-微信，2-支付宝
   */
-static void App_qrcode_show(const uint8_t* image)
+static void App_qrcode_show(const uint8_t* image, uint8_t type)
 {
 	int8_t key;
 
 	Inf_oled_fade_flag = 1;
 
 	Inf_oled_clear();
-	Inf_oled_show_image(32, 0, 64, 64, image);
+	if(type == 1)
+	{
+		Inf_oled_show_image(41, 7, 45, 48, image);
+	}
+	else if(type == 2)
+	{
+		Inf_oled_show_image(43, 11, 41, 41, image);
+	}
+
 	Inf_oled_update();
 
 	while (1)
@@ -328,13 +338,13 @@ static void App_qrcode_show(const uint8_t* image)
   * 函   数：App_qrcode_wechat
   * 功   能：微信收款码（占位图）
   */
-void App_qrcode_wechat(void) { App_qrcode_show(qrcode_wechat_img); }
+void App_qrcode_wechat(void) { App_qrcode_show(qrcode_wechat_img, 1); }
 
 /**
   * 函   数：App_qrcode_zfb
   * 功   能：支付宝收款码（占位图）
   */
-void App_qrcode_zfb(void) { App_qrcode_show(qrcode_zfb_img); }
+void App_qrcode_zfb(void) { App_qrcode_show(qrcode_zfb_img, 2); }
 
 
 /**
