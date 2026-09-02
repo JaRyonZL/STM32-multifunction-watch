@@ -23,7 +23,7 @@ int main(void)
 	Inf_battery_init();
 	Drv_tim2_init();
 	Inf_rtc_init();
-	Inf_mp3_init();
+	Inf_mp3_detect_init();
 	Inf_key_init();
 
 	while (1)
