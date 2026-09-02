@@ -876,6 +876,16 @@
               <FileType>5</FileType>
               <FilePath>.\Inf\Inf_mp3.h</FilePath>
             </File>
+            <File>
+              <FileName>Inf_video_in.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Inf\Inf_video_in.c</FilePath>
+            </File>
+            <File>
+              <FileName>Inf_video_in.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inf\Inf_video_in.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
