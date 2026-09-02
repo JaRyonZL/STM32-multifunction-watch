@@ -951,6 +951,16 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_detection.h</FilePath>
             </File>
+            <File>
+              <FileName>App_game.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_game.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_game.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_game.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
