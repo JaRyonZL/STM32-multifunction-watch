@@ -1,0 +1,232 @@
+#include "App_menu_data.h"
+#include "App_menu.h"
+#include "Inf_oled.h"
+#include "Inf_oled_gfx.h"
+#include "Inf_battery.h"
+#include "Inf_key.h"
+#include "Drv_adc.h"
+
+/******************************************************************************
+ * 文件名：App_menu_data.c（应用层）
+ * 说   明：设置/信息类应用（迁移自旧工程 menu_Data.c 的设置部分）
+ *          设置重启后不保存（RAM 变量，旧固件行为）
+ ******************************************************************************/
+
+/* 设置状态 */
+static uint8_t App_settings_inverse = 0;       /* 反色显示开关 */
+static uint8_t App_settings_precharge = 0xF1;  /* 预充电周期 0xD9 */
+static uint8_t App_settings_divide = 0xFE;     /* 显示时钟分频 0xD5 */
+
+/* 静态函数声明 */
+static void App_settings_cursor_run(void);
+static void App_settings_cursor_arrow(void);
+static void App_settings_cursor_block(void);
+static void App_settings_cursor_pointer(void);
+static void App_settings_brightness_apply(void);
+static void App_settings_inverse_apply(void);
+static void App_settings_adjust_run(uint8_t* value, uint8_t cmd);
+static void App_settings_precharge_run(void);
+static void App_settings_divide_run(void);
+static void App_settings_information(void);
+static void App_settings_voltage_run(void);
+
+/**
+  * 函   数：App_settings_run
+  * 功   能：设置菜单（旧 System_settings 六项）
+  */
+void App_settings_run(void)
+{
+	App_menu_option2_t option_list[] = {
+		{"- 返回"          , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,             0, 0},
+		{"- 屏幕亮度"      , APP_MENU_MODE_NUMBER,   App_settings_brightness_apply, &Inf_oled_brightness, 0},
+		{"- 光标样式"      , APP_MENU_MODE_FUNCTION, App_settings_cursor_run,     0, 0},
+		{"- 反色显示"      , APP_MENU_MODE_ON_OFF,   App_settings_inverse_apply,   &App_settings_inverse, 0},
+		{"- 信息"          , APP_MENU_MODE_FUNCTION, App_settings_information,     0, 0},
+		{"- 预充电周期"    , APP_MENU_MODE_FUNCTION, App_settings_precharge_run,  0, 0},
+		{"- 显示时钟分频比", APP_MENU_MODE_FUNCTION, App_settings_divide_run,     0, 0},
+		{".."}
+	};
+
+	App_menu_run_list(option_list);
+}
+
+/**
+  * 函   数：App_settings_cursor_run
+  * 功   能：光标样式子菜单（Cursor 为死设置）
+  */
+static void App_settings_cursor_run(void)
+{
+	App_menu_option2_t option_list[] = {
+		{"- 返回", APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,           0, 0},
+		{"- 反色", APP_MENU_MODE_FUNCTION, App_settings_cursor_arrow,  0, 0},
+		{"- 矩形", APP_MENU_MODE_FUNCTION, App_settings_cursor_block,  0, 0},
+		{"- 指针", APP_MENU_MODE_FUNCTION, App_settings_cursor_pointer, 0, 0},
+		{".."}
+	};
+
+	App_menu_run_list(option_list);
+}
+
+static void App_settings_cursor_arrow(void) { App_menu_cursor = 0; }
+static void App_settings_cursor_block(void) { App_menu_cursor = 1; }
+static void App_settings_cursor_pointer(void) { App_menu_cursor = 2; }
+
+/**
+  * 函   数：App_settings_brightness_apply
+  * 功   能：亮度立即写入 OLED
+  */
+static void App_settings_brightness_apply(void)
+{
+	Inf_oled_write_command(0x81);	/* 设置对比度 */
+	Inf_oled_write_command(Inf_oled_brightness);	/* 0x00~0xFF */
+}
+
+/**
+  * 函   数：App_settings_inverse_apply
+  * 功   能：反色显示切换
+  */
+static void App_settings_inverse_apply(void)
+{
+	if (App_settings_inverse)
+	{
+		Inf_oled_write_command(0xA7);   /* 反色显示 */
+	}
+	else
+	{
+		Inf_oled_write_command(0xA6);   /* 正常显示 */
+	}
+}
+
+/**
+  * 函   数：App_settings_adjust_run
+  * 功   能：十六进制调节循环：
+  *          上下键±1并立即写入 OLED 命令，确定键退出
+  */
+static void App_settings_adjust_run(uint8_t* value, uint8_t cmd)
+{
+	int8_t key;
+
+	Inf_oled_fade_flag = 1;
+
+	while (1)
+	{
+		Inf_oled_show_hex_num(100, 20, *value, 4, OLED_6X8);
+		Inf_oled_update();
+
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key == 1)
+		{
+			(*value)++;
+			Inf_oled_write_command(cmd);
+			Inf_oled_write_command(*value);
+		}
+		else if (key == 2)
+		{
+			(*value)--;
+			Inf_oled_write_command(cmd);
+			Inf_oled_write_command(*value);
+		}
+
+		if (key == 3 || key == 4)
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
+
+/**
+  * 函   数：App_settings_precharge_run
+  * 功   能：预充电周期调节
+  */
+static void App_settings_precharge_run(void)
+{
+	App_settings_adjust_run(&App_settings_precharge, 0xD9);
+}
+
+/**
+  * 函   数：App_settings_divide_run
+  * 功   能：显示时钟分频调节
+  */
+static void App_settings_divide_run(void)
+{
+	App_settings_adjust_run(&App_settings_divide, 0xD5);
+}
+
+/**
+  * 函   数：App_settings_information
+  * 功   能：信息页（旧 System_information，固件版本号更新为 V2.0）
+  */
+static void App_settings_information(void)
+{
+	App_menu_option2_t option_list[] = {
+		{"- 返回"              , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,        0, 0},
+		{"-----STM32C8T6-----" , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"- RAM; 20K"          , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"- FLASH: 64K"        , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"------W25Q128------"  , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"- 储存:16MB"          , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"-------------------" , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"- 固件版本V2.0 改版", APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"- BiliBili 时光久泽" , APP_MENU_MODE_DISPLAY,  0, 0, 0},
+		{"- 系统电压"          , APP_MENU_MODE_FUNCTION, App_settings_voltage_run, 0, 0},
+		{".."}
+	};
+
+	App_menu_run_list(option_list);
+}
+
+/**
+  * 函   数：App_settings_voltage_run
+  * 功   能：系统电压校准页：显示 VIN 基准、
+  *          CH8/CH17 采样与换算电压，上下键微调 VIN(±0.01)，确定键退出
+  */
+static void App_settings_voltage_run(void)
+{
+	int8_t key;
+	uint16_t ADValue, ADrefint;
+	float voltage;
+
+	Inf_oled_fade_flag = 1;
+
+	while (1)
+	{
+		ADValue = Drv_adc1_get_value(ADC_CH_BATTERY);
+		ADrefint = Drv_adc1_get_value(ADC_CH_VREFINT);
+
+		Inf_oled_clear();
+
+		Inf_oled_show_float_num(5, 2, VIN, 2, 3, OLED_6X8);
+		Inf_oled_show_num(5, 15, ADrefint, 4, OLED_6X8);
+		Inf_oled_show_num(5, 25, ADValue, 4, OLED_6X8);
+
+		voltage = ((float)ADValue * VIN) / 4095 * 2;
+		Inf_oled_show_float_num(64, 25, voltage, 2, 2, OLED_6X8);
+
+		voltage = ((float)ADrefint * VIN) / 4095;   /* 得到电压 */
+		Inf_oled_show_float_num(64, 35, voltage, 2, 2, OLED_6X8);
+
+		Inf_oled_update();
+		Inf_oled_gradient(1);
+
+		key = Inf_key_scan();
+		if (key == 1)
+		{
+			VIN = VIN + 0.01;
+		}
+		else if (key == 2)
+		{
+			VIN = VIN - 0.01;
+		}
+
+		if (key == 3 || key == 4)
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
