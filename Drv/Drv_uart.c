@@ -132,9 +132,12 @@ uint8_t Drv_uart_read_byte(Drv_uart_inst_t* inst)
 
 	if (inst->RxCount)
 	{
+		/* 临界区：防IRQ在RxCount读-改-写期间抢占丢计数 */
+		__disable_irq();
 		tail = (inst->RxHead + inst->RxBufSize - inst->RxCount) % inst->RxBufSize;
 		data = inst->RxBuf[tail];
 		inst->RxCount--;
+		__enable_irq();
 	}
 
 	return data;
