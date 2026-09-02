@@ -7,6 +7,7 @@
 #include "App_voltage.h"
 #include "App_mp3.h"
 #include "App_video.h"
+#include "App_game.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -414,7 +415,6 @@ void App_menu_run_wheel(App_menu_option1_t* option)
  ******************************************************************************/
 void App_qrcode_wechat(void) {}
 void App_qrcode_zfb(void) {}
-void App_game_run(void) {}
 void App_calc_cos(void) {}
 void App_font_browser(void) {}
 void App_settings_run(void) {}
@@ -435,7 +435,7 @@ void App_menu_main_wheel(void)
 		{"收款微信"        , App_qrcode_wechat, APPWXZF},
 		{"收款支付宝"      , App_qrcode_zfb,    APPZFBZF},
 		{"视频"            , App_video_menu,    APPVIDEO},
-		{"Life_Play"       , App_game_run,      APPGAME},
+		{"游戏"            , App_game_menu,     APPGAME},
 		{"cos(x)-1"        , App_calc_cos,      bug},
 		{"W25Q128字库浏览" , App_font_browser,  bug},
 		{"设置"            , App_settings_run,  APPsetting},
