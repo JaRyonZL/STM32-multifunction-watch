@@ -28,6 +28,8 @@ void App_mp3_player(void)
 
 	while (1)
 	{
+		Inf_mp3_poll();   /* 处理模块回传（0x3D切歌等） */
+
 		Inf_oled_clear();
 
 		App_watchface_show_battery(90, 0);
