@@ -961,6 +961,26 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_game.h</FilePath>
             </File>
+            <File>
+              <FileName>App_menu_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_menu_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_menu_data.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_menu_data.h</FilePath>
+            </File>
+            <File>
+              <FileName>App_power.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_power.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_power.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_power.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
