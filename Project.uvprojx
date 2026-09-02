@@ -911,6 +911,16 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_voltage.h</FilePath>
             </File>
+            <File>
+              <FileName>App_mp3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_mp3.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_mp3.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_mp3.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
