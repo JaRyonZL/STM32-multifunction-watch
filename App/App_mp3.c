@@ -28,35 +28,6 @@ void App_mp3_player(void)
 
 	while (1)
 	{
-		/* 模块中途断电：提示等待重新上电 */
-		if (!Inf_mp3_is_powered())
-		{
-			Inf_mp3.playing = 0;
-			Inf_mp3.update_pending = 0;
-
-			Inf_oled_write_command(0xAD);   /* 设置充电泵 */
-			Inf_oled_write_command(0x8B);   /* 开启充电泵 */
-			Inf_oled_write_command(0xAF);   /* 确保显示开（可能熄屏） */
-			Inf_oled_fade_flag = 1;
-			Inf_oled_gradient(0);
-			Inf_oled_clear();
-			Inf_oled_show_string(0, 13, "请开启MP3电源", OLED_6X8);
-			Inf_oled_show_string(0, 26, "<--", OLED_6X8);
-
-			while (!Inf_mp3_is_powered())
-			{
-				Inf_oled_gradient(1);
-				Inf_oled_update();
-			}
-
-			Inf_oled_gradient(0);
-			Inf_mp3_init();                 /* 模块重启：重新初始化串口/功放 */
-			Inf_mp3_loudspeaker();
-			idle_cnt = 2;
-			Inf_oled_fade_flag = 1;
-			continue;
-		}
-
 		Inf_oled_clear();
 
 		App_watchface_show_battery(90, 0);
