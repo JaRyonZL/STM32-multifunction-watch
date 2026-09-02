@@ -901,6 +901,16 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_watchface.h</FilePath>
             </File>
+            <File>
+              <FileName>App_voltage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_voltage.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_voltage.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_voltage.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
