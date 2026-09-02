@@ -179,11 +179,22 @@ void App_mp3_run(void)
 		Inf_oled_clear();
 		Inf_oled_show_string(0, 13, "请开启MP3电源", OLED_6X8);
 		Inf_oled_show_string(0, 26, "<--", OLED_6X8);
+		Inf_oled_show_string(0, 50, "确定键退出", OLED_6X8);
 
 		while (!Inf_mp3_is_powered())
 		{
+			int8_t key;
+
 			Inf_oled_gradient(1);
 			Inf_oled_update();
+
+			key = Inf_key_scan();
+			if (key == 3 || key == 4)   /* 确定键：退出提示 */
+			{
+				Inf_oled_fade_flag = 1;
+				Inf_oled_gradient(0);
+				return;
+			}
 		}
 
 		Inf_oled_gradient(0);
