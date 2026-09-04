@@ -942,6 +942,16 @@
               <FilePath>.\App\App_video.h</FilePath>
             </File>
             <File>
+              <FileName>App_calcu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_calcu.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_calcu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_calcu.h</FilePath>
+            </File>
+            <File>
               <FileName>App_detection.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\App\App_detection.c</FilePath>
