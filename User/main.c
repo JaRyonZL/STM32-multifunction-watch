@@ -93,7 +93,7 @@ int main(void)
 			Inf_oled_gradient(1);
 		}
 
-		if (key == 1)          /* 上键：再进轮盘菜单 */
+		if (key == 3)          /* 确认短按：进轮盘菜单 */
 		{
 			idle_tick = Drv_tim2_get_tick();
 			Inf_oled_fade_flag = 1;
