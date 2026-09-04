@@ -224,7 +224,7 @@ void App_watchface_show_battery(uint8_t X, uint8_t Y)
 void App_watchface_time_adjust(void)
 {
 	uint8_t field_index = 0;    /* 当前编辑字段：0=年 1=月 2=日 3=时 4=分 5=秒 */
-	uint16_t value;
+	int16_t value;
 
 	Inf_oled_fade_flag = 1;
 
@@ -262,12 +262,12 @@ void App_watchface_time_adjust(void)
 			value++;
             
             // 进位限制
-            if(field_index == 0)  { if(value >= 2099)   {value = 2099;} }  // 年设置
-            else if(field_index == 1)  { if(value >= 12)   {value = 1;} }  // 月设置
-            else if(field_index == 2)  { if(value >= 31)   {value = 1;} }  // 日设置
-            else if(field_index == 3)  { if(value >= 23)   {value = 0;} }  // 时设置
-            else if(field_index == 4)  { if(value >= 60)   {value = 0;} }  // 分设置
-            else if(field_index == 5)  { if(value >= 60)   {value = 0;} }  // 秒设置
+            if(field_index == 0)  { if(value > 2099)   {value = 2099;} }  // 年设置
+            else if(field_index == 1)  { if(value > 12)   {value = 1;} }  // 月设置
+            else if(field_index == 2)  { if(value > 31)   {value = 1;} }  // 日设置
+            else if(field_index == 3)  { if(value > 23)   {value = 0;} }  // 时设置
+            else if(field_index == 4)  { if(value > 59)   {value = 0;} }  // 分设置
+            else if(field_index == 5)  { if(value > 59)   {value = 0;} }  // 秒设置
             
 			Inf_rtc_time[field_index] = value;
 		}
@@ -277,12 +277,12 @@ void App_watchface_time_adjust(void)
 			value--;
             
             // 进位限制
-            if(field_index == 0)  { if(value <= 1970)   {value = 2099;} }  // 年设置
-            else if(field_index == 1)  { if(value <= 1)   {value = 12;} }  // 月设置
-            else if(field_index == 2)  { if(value <= 1)   {value = 31;} }  // 日设置
-            else if(field_index == 3)  { if(value <= 0)   {value = 23;} }  // 时设置
-            else if(field_index == 4)  { if(value <= 0)   {value = 59;} }  // 分设置
-            else if(field_index == 5)  { if(value <= 0)   {value = 59;} }  // 秒设置
+            if(field_index == 0)  { if(value < 1970)   {value = 2099;} }  // 年设置
+            else if(field_index == 1)  { if(value < 1)   {value = 12;} }  // 月设置
+            else if(field_index == 2)  { if(value < 1)   {value = 31;} }  // 日设置
+            else if(field_index == 3)  { if(value < 0)   {value = 23;} }  // 时设置
+            else if(field_index == 4)  { if(value < 0)   {value = 59;} }  // 分设置
+            else if(field_index == 5)  { if(value < 0)   {value = 59;} }  // 秒设置
             
 			Inf_rtc_time[field_index] = value;
 		}
