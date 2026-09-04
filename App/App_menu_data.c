@@ -352,56 +352,6 @@ void App_qrcode_zfb(void) { App_qrcode_show(qrcode_zfb_img, 2); }
 
 
 /**
-  * 函   数：App_calc_cos
-  * 功   能：cos 计算器（旧 cosjiaod）：cos 值与 asin/acos 换算角度显示，
-  *          上下键±0.01（短按确定切 ±0.01 步进），长按退出
-  */
-void App_calc_cos(void)
-{
-	int8_t key, i = 0;
-	float cos1 = 0, tpp, tpp1;
-
-	Inf_oled_fade_flag = 1;
-
-	Inf_oled_clear();
-
-	while (1)
-	{
-		tpp = asin(cos1);
-		tpp1 = acos(cos1);
-
-		Inf_oled_show_float_num(10, 10, cos1, 1, 3, OLED_6X8);
-		Inf_oled_show_float_num(10, 30, tpp / 3.141592 * 180, 2, 9, OLED_6X8);
-		Inf_oled_show_float_num(10, 40, tpp1 / 3.141592 * 180, 2, 9, OLED_6X8);
-		Inf_oled_update();
-
-		Inf_oled_gradient(1);
-
-		key = Inf_key_scan();
-		if (key == 1)
-		{
-			if (i) cos1 += 0.01;
-			else cos1 += 0.01;
-		}
-		else if (key == 2)
-		{
-			if (i) cos1 -= 0.01;
-			else cos1 -= 0.01;
-		}
-
-		if (key == 3) { i = !i; }
-		else if (key == 4)
-		{
-			Inf_oled_fade_flag = 1;
-			Inf_oled_gradient(0);
-			return;
-		}
-	}
-}
-
-
-
-/**
   * 函   数：App_font_browser
   * 功   能：字库浏览：4×10 网格滚动显示 12x12 汉字，
   *          上下键调滚动速度(dld±10)，确定键退出
