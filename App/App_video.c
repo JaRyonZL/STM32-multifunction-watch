@@ -282,7 +282,7 @@ static void App_video_show_tip(char* str)
   * 功   能：烧录前擦除旧视频数据区（按旧文件头帧数算扇区数，
   *          W25Q 编程只能1->0，重复烧录必须先擦除）
   */
-static void App_video_erase_old(uint32_t address)
+static uint8_t App_video_erase_old(uint32_t address)
 {
 	uint8_t temp[3];
 	uint32_t pdata = 0;
@@ -307,7 +307,16 @@ static void App_video_erase_old(uint32_t address)
 			Inf_w25q_sector_erase(address + (pdata * 4096));
 			pdata++;
 		}
+		return 1;
 	}
+	else if (temp[0] == 0xFF && temp[1] == 0xFF && temp[2] == 0xFF)
+	{
+		return 1;   /* 空白区域：可直接烧录 */
+	}
+
+	/* 残留垃圾数据（如视频区地址后移前的旧帧数据）：位与会烧坏，需先整体擦除 */
+	App_video_show_tip("请先擦除所有视频");
+	return 0;
 }
 
 /**
@@ -317,7 +326,7 @@ static void App_video_erase_old(uint32_t address)
 void App_video_write_first(void)
 {
 	Inf_w25q_write_status();     /* 取消写保护 */
-	App_video_erase_old(APP_VIDEO_BASE_ADDRESS);
+	if (!App_video_erase_old(APP_VIDEO_BASE_ADDRESS)) return;
 	App_video_write(APP_VIDEO_BASE_ADDRESS);
 }
 
@@ -338,7 +347,7 @@ void App_video_write_second(void)
 		return;
 	}
 
-	App_video_erase_old(address);
+	if (!App_video_erase_old(address)) return;
 	App_video_write(address);
 }
 
@@ -365,7 +374,7 @@ void App_video_write_third(void)
 		return;
 	}
 
-	App_video_erase_old(data);
+	if (!App_video_erase_old(data)) return;
 	App_video_write(data);
 }
 
