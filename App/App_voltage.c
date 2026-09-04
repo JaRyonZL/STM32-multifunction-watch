@@ -1,4 +1,5 @@
 #include "App_voltage.h"
+#include "App_settings_store.h"
 #include "App_watchface.h"
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
@@ -140,6 +141,7 @@ void App_voltage_run(void)
 		{
 			Inf_oled_fade_flag = 1;
 			Inf_oled_gradient(0);
+			App_settings_store_save();   /* ±£¥Ê…Ë÷√ */
 			return;
 		}
 	}
