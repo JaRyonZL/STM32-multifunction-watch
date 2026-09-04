@@ -444,8 +444,8 @@ void App_menu_main_wheel(void)
 		{"收款支付宝"      , App_qrcode_zfb,    APPZFBZF},
 		{"视频"            , App_video_menu,    APPVIDEO},
 		{"游戏"            , App_game_menu,     APPGAME},
-		{"cos(x)-1"        , App_calc_cos,      bug},
-		{"W25Q128字库浏览" , App_font_browser,  bug},
+		{"cos(x)-1"        , App_calc_cos,      calcu},
+		{"字库浏览"        , App_font_browser,  CNLib},
 		{"设置"            , App_settings_run,  APPsetting},
 		{".."}                                  /* 结尾标志，不可删除 */
 	};
