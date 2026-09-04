@@ -260,12 +260,30 @@ void App_watchface_time_adjust(void)
 		{
 			value = Inf_rtc_time[field_index];
 			value++;
+            
+            // 进位限制
+            if(field_index == 0)  { if(value >= 2099)   {value = 2099;} }  // 年设置
+            else if(field_index == 1)  { if(value >= 12)   {value = 1;} }  // 月设置
+            else if(field_index == 2)  { if(value >= 31)   {value = 1;} }  // 日设置
+            else if(field_index == 3)  { if(value >= 23)   {value = 0;} }  // 时设置
+            else if(field_index == 4)  { if(value >= 60)   {value = 0;} }  // 分设置
+            else if(field_index == 5)  { if(value >= 60)   {value = 0;} }  // 秒设置
+            
 			Inf_rtc_time[field_index] = value;
 		}
 		else if (key == 2)          /* 下键：当前字段-1 */
 		{
 			value = Inf_rtc_time[field_index];
 			value--;
+            
+            // 进位限制
+            if(field_index == 0)  { if(value <= 1970)   {value = 2099;} }  // 年设置
+            else if(field_index == 1)  { if(value <= 1)   {value = 12;} }  // 月设置
+            else if(field_index == 2)  { if(value <= 1)   {value = 31;} }  // 日设置
+            else if(field_index == 3)  { if(value <= 0)   {value = 23;} }  // 时设置
+            else if(field_index == 4)  { if(value <= 0)   {value = 59;} }  // 分设置
+            else if(field_index == 5)  { if(value <= 0)   {value = 59;} }  // 秒设置
+            
 			Inf_rtc_time[field_index] = value;
 		}
 
