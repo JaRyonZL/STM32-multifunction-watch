@@ -1,4 +1,5 @@
 #include "App_menu_data.h"
+#include "App_settings_store.h"
 #include "App_menu.h"
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
@@ -51,6 +52,7 @@ void App_settings_run(void)
 	};
 
 	App_menu_run_list(option_list);
+	App_settings_store_save();   /* 设置菜单退出：保存设置 */
 }
 
 /**
@@ -136,6 +138,7 @@ static void App_settings_adjust_run(uint8_t* value, uint8_t cmd)
 		{
 			Inf_oled_fade_flag = 1;
 			Inf_oled_gradient(0);
+			App_settings_store_save();   /* 保存设置 */
 			return;
 		}
 	}
@@ -229,6 +232,7 @@ static void App_settings_voltage_run(void)
 		{
 			Inf_oled_fade_flag = 1;
 			Inf_oled_gradient(0);
+			App_settings_store_save();   /* 保存设置 */
 			return;
 		}
 	}

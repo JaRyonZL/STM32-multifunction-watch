@@ -1,4 +1,5 @@
 #include "App_mp3.h"
+#include "App_settings_store.h"
 #include "App_watchface.h"
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
@@ -218,6 +219,8 @@ void App_mp3_run(void)
 	};
 
 	App_menu_run_list(option_list);
+
+	App_settings_store_save();   /* 音乐设置菜单退出：保存设置 */
 
 	Inf_mp3_power_off();
 }
