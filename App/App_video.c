@@ -15,8 +15,8 @@
  *          播放时 MP3 模块伴音：0x0F 指定文件夹播放
  ******************************************************************************/
 
-/* 视频区起始地址 0x28000（与 W25Q128 分区约定一致） */
-#define APP_VIDEO_BASE_ADDRESS 163840
+/* 视频区起始地址 0x30000（前为0x28000起32KB设置区，见App_settings_store） */
+#define APP_VIDEO_BASE_ADDRESS 196608
 
 /**
   * 函   数：App_video_stop_mp3
@@ -378,7 +378,7 @@ void App_video_write_third(void)
 void App_video_erase(void)
 {
 	int8_t key;
-	uint32_t data = 163840;   /* 视频区起始地址 0x28000 */
+	uint32_t data = APP_VIDEO_BASE_ADDRESS;   /* 视频区起始地址 0x30000 */
 
 	Inf_oled_fade_flag = 1;
 
