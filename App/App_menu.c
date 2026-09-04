@@ -9,6 +9,7 @@
 #include "App_video.h"
 #include "App_game.h"
 #include "App_menu_data.h"
+#include "App_stopwatch.h"
 
 /******************************************************************************
  * 文件名称：App_menu.c（应用层）
@@ -43,6 +44,28 @@ void App_menu_reverse_area_frame(uint8_t X, uint8_t Y, uint8_t Width, uint8_t He
 	Inf_oled_reverse_area(X, Y + 1, Width, Height - 2);
 	Inf_oled_reverse_area(X + 1, Y + Height - 1, Width - 2, 1);
 }
+
+/**
+  * 函   数：App_menu_draw_cursor
+  * 功   能：按当前光标样式绘制光标（0=反色框 1=矩形框 2="<-"尾标），
+  *          菜单与秒表等界面共用，保证全系统光标样式统一
+  */
+void App_menu_draw_cursor(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height)
+{
+	if (App_menu_cursor == 0)
+	{
+		App_menu_reverse_area_frame(X, Y, Width, Height);
+	}
+	else if (App_menu_cursor == 1)
+	{
+		Inf_oled_draw_rectangle(X, Y, Width, Height, OLED_UNFILLED);
+	}
+	else
+	{
+		Inf_oled_show_string(X + Width, Y + 2, "<-", OLED_6X8);   /* 尾标指针 */
+	}
+}
+
 
 /**
   * 函    数：App_menu_run_list
@@ -150,12 +173,7 @@ void App_menu_run_list(App_menu_option2_t* option)
 		else { cursor_len_cur = cursor_len_target; }
 
 		/* 显示光标 */
-		if (App_menu_cursor == 0)
-			App_menu_reverse_area_frame(0, cursor_pos_cur, cursor_len_cur, 16);   /* 在光标位置取反 */
-		else if (App_menu_cursor == 1)
-			Inf_oled_draw_rectangle(0, cursor_pos_cur, cursor_len_cur, 16, OLED_UNFILLED);
-		else if (App_menu_cursor == 2)
-			Inf_oled_show_string(cursor_len_cur, cursor_pos_cur + 2, "<-", OLED_6X8);   /* 尾部光标 */
+		App_menu_draw_cursor(0, cursor_pos_cur, cursor_len_cur, 16);   /* 按光标样式绘制 */
 
 		/* 进度条 */
 		if (sel_index == item_max) { bar_target = 64; }
@@ -445,7 +463,7 @@ void App_menu_main_list(void)
 	App_menu_option2_t option_list[] = {
 		{"- 返回"    , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,         0, 0},
 		{"- 手电筒"  , APP_MENU_MODE_FUNCTION, App_flashlight,          0, 0},
-		{"- 便签"    , APP_MENU_MODE_FUNCTION, App_error,               0, 0},
+		{"- 秒表"    , APP_MENU_MODE_FUNCTION, App_stopwatch_run,        0, 0},
 		{"- 时间调整", APP_MENU_MODE_FUNCTION, App_watchface_time_adjust, 0, 0},
 		{".."}                                  /* 结尾标志，不可删除 */
 	};

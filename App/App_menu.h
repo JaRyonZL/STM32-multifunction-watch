@@ -62,6 +62,7 @@ typedef struct
  ******************************************************************************/
 uint8_t App_menu_get_name_len(char* String);    /* 计算名称显示宽度：GBK一字=2列，ASCII=1列 */
 void App_menu_reverse_area_frame(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height); /* 空心反色框 */
+void App_menu_draw_cursor(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height); /* 按光标样式绘制（菜单/秒表共用） */
 void App_menu_run_list(App_menu_option2_t* option);  /* 列表菜单 */
 void App_menu_run_wheel(App_menu_option1_t* option); /* 图标轮盘菜单 */
 
