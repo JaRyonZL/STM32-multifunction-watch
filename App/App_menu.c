@@ -63,10 +63,16 @@ void App_menu_draw_cursor(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height)
 	}
 	else
 	{
-		Inf_oled_show_string(X + Width, Y + 2, "<-", OLED_6X8);   /* 尾标指针 */
+		if (X + Width + 12 > 128)   /* 尾标超出屏幕右边界时回退到框内右侧 */
+		{
+			Inf_oled_show_string(X + Width - 12, Y + 2, "<-", OLED_6X8);
+		}
+		else
+		{
+			Inf_oled_show_string(X + Width, Y + 2, "<-", OLED_6X8);   /* 尾标指针 */
+		}
 	}
 }
-
 
 /**
   * 函    数：App_menu_run_list
