@@ -12,6 +12,7 @@
 #include "App_menu.h"
 #include "App_watchface.h"
 #include "App_power.h"
+#include "App_settings_store.h"
 
 uint8_t TLYPW = 0;             /* 体感开关状态标志位（MPU6050暂缓，预留） */
 
@@ -26,6 +27,7 @@ int main(void)
 	Inf_oled_write_command(0x00);	/* 0x00~0xFF */
 
 	Inf_w25q_init();    /* W25Q 字库（中文显示依赖，内部含SPI1） */
+	App_settings_store_load();   /* 上电恢复用户设置 */
 
 	Drv_tim2_init();    /* 1ms心跳（须先于RTC，进行LSI校准） */
 	Inf_rtc_init();     /* RTC初始化 */
