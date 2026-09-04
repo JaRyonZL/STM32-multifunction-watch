@@ -10,5 +10,6 @@
 
 void App_calcu_menu(void);   /* 计算子菜单：选择计算工具进入（后续扩展在此加项） */
 void App_calc_cos(void);     /* cos(x)-1 计算器 */
+void App_calcu_convert(void);   /* 进制转换：16位 二/十/八/十六进制互转 */
 
 #endif
