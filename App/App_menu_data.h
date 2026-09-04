@@ -17,4 +17,8 @@ void App_qrcode_zfb(void);        /* 支付宝收款码（占位图） */
 void App_calc_cos(void);          /* cos 计算器 */
 void App_font_browser(void);      /* 字库浏览 */
 
+extern uint8_t App_settings_inverse;     /* 反色显示开关 */
+extern uint8_t App_settings_precharge;   /* 预充电周期 */
+extern uint8_t App_settings_divide;      /* 显示时钟分频 */
+
 #endif

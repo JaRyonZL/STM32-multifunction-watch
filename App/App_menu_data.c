@@ -16,9 +16,9 @@
  ******************************************************************************/
 
 /* 设置状态 */
-static uint8_t App_settings_inverse = 0;       /* 反色显示开关 */
-static uint8_t App_settings_precharge = 0xF1;  /* 预充电周期 0xD9 */
-static uint8_t App_settings_divide = 0xFE;     /* 显示时钟分频 0xD5 */
+uint8_t App_settings_inverse = 0;       /* 反色显示开关 */
+uint8_t App_settings_precharge = 0xF1;  /* 预充电周期 0xD9 */
+uint8_t App_settings_divide = 0xFE;     /* 显示时钟分频 0xD5 */
 
 /* 静态函数声明 */
 static void App_settings_cursor_run(void);
