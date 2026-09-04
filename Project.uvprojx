@@ -981,6 +981,26 @@
               <FileType>5</FileType>
               <FilePath>.\App\App_power.h</FilePath>
             </File>
+            <File>
+              <FileName>App_settings_store.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_settings_store.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_settings_store.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_settings_store.h</FilePath>
+            </File>
+            <File>
+              <FileName>App_stopwatch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\App_stopwatch.c</FilePath>
+            </File>
+            <File>
+              <FileName>App_stopwatch.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\App_stopwatch.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
