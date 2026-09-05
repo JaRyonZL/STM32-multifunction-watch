@@ -7,6 +7,7 @@
 #include "Inf_mp3.h"
 #include "Inf_key.h"
 #include "Drv_delay.h"
+#include "Drv_tim.h"
 
 /******************************************************************************
  * 文件名：App_video.c（应用层）
@@ -61,7 +62,7 @@ static void App_video_play(uint32_t address, uint16_t mpg)
 	uint8_t temp[3];       /* 文件头(3字节) */
 	uint32_t mydata = 0;   /* 数据量(不含文件头) */
 	uint32_t datasite = 3; /* 帧数据偏移地址 */
-	uint16_t temm = 15;    /* 帧间隔时间(ms) */
+	uint16_t temm = 36;    /* 帧周期(ms)，默认约 28FPS（实测视频源实际帧率） */
 
 	Inf_oled_clear();
 	Inf_oled_update();
@@ -83,7 +84,7 @@ static void App_video_play(uint32_t address, uint16_t mpg)
 
 	mydata = (temp[2] << 8) | temp[1];  /* 获取总帧数 */
 
-	Inf_oled_show_string(0, 0, "帧数:30FPS", OLED_6X8);
+	Inf_oled_show_string(0, 0, "帧数:28FPS", OLED_6X8);
 	Inf_oled_show_string(0, 13, "帧数:", OLED_6X8);
 	Inf_oled_show_num(38, 15, mydata, 4, OLED_6X8);
 
@@ -103,6 +104,7 @@ static void App_video_play(uint32_t address, uint16_t mpg)
 		Inf_mp3_loudspeaker();
 		Drv_delay_ms(50);
 		Inf_mp3_send_cmd(0x0F, 0x00, mpg);              /* 指定文件夹播放 */
+		Drv_delay_ms(400);                              /* 等待DFPlayer音频启动，补偿音画开头差 */
 	}
 	else Inf_oled_show_string(0, 52, "MP3未打开", OLED_6X8);
 
@@ -112,15 +114,25 @@ static void App_video_play(uint32_t address, uint16_t mpg)
 
 	while (1)
 	{
-		Inf_w25q_read_data(address + datasite, Inf_oled_display_buf[0], 1024); /* 读取一帧到显存 */
-		datasite += 1024;       /* 地址偏移到下一帧 */
+		{
+			uint32_t frame_start = Drv_tim2_get_us();
 
-		Drv_delay_ms(temm);		/* 帧间隔时间 */
+			Inf_w25q_read_data(address + datasite, Inf_oled_display_buf[0], 1024); /* 读取一帧到显存 */
+			datasite += 1024;       /* 地址偏移到下一帧 */
 
-		Inf_oled_update();
-		Inf_oled_gradient(1);
+			Inf_oled_update();
+			Inf_oled_gradient(1);
 
-		key = Inf_key_scan();   /* 上下键微调帧速 */
+			/* 帧周期对齐（μs计时消除取整漂移）：刷新耗时从周期中扣除，实际帧率=1000/temm */
+			{
+				uint32_t spent = Drv_tim2_get_us() - frame_start;
+				uint32_t period_us = (uint32_t)temm * 1000;
+				if (spent < period_us) { Drv_delay_us(period_us - spent); }
+			}
+		}
+
+
+		key = Inf_key_scan();   /* 上下键微调帧周期 */
 		if (key == 1)
 		{
 			temm++;
