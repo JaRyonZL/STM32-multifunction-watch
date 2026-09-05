@@ -25,6 +25,14 @@ void App_mp3_player(void)
 	uint8_t key;
 	uint16_t idle_cnt = 2;   /* 屏幕熄灭等待计数 */
 
+	/* 进入播放界面：同步曲目显示与模块实际状态（模块上电处于记忆曲目，需显式指定） */
+	Inf_mp3_send_volume();
+	Drv_delay_ms(50);
+	Inf_mp3_send_cmd(0x12, 0x00, Inf_mp3.chapter);
+	Drv_delay_ms(50);
+	Inf_mp3_send_cmd(0x0E, 0x00, 0x00);              /* 停止，等待用户按播放键 */
+	Inf_mp3.playing = 0;
+
 	Inf_oled_fade_flag = 1;
 
 	while (1)
