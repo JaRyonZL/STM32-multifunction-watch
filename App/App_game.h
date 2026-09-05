@@ -10,5 +10,6 @@
 
 void App_game_menu(void);   /* 游戏子菜单：选择游戏进入（后续扩展在此加项） */
 void App_game_life_run(void);    /* 生命游戏入口 */
+void App_game_block_run(void);    /* 打砖块游戏 */
 
 #endif

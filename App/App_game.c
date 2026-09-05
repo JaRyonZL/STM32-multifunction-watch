@@ -3,6 +3,7 @@
 #include "Inf_oled.h"
 #include "Inf_oled_gfx.h"
 #include "Inf_key.h"
+#include "Com_oled_res.h"
 
 /******************************************************************************
  * 文件名：App_game.c（应用层）
@@ -36,6 +37,7 @@ void App_game_menu(void)
 	App_menu_option2_t option_list[] = {
 		{"- 退出"    , APP_MENU_MODE_FUNCTION, APP_MENU_RETURN,   0, 0},
 		{"- 生命游戏", APP_MENU_MODE_FUNCTION, App_game_life_run, 0, 0},
+		{"- 打砖块"  , APP_MENU_MODE_FUNCTION, App_game_block_run, 0, 0},
 		{".."}
 	};
 
@@ -193,3 +195,145 @@ static void App_game_life_seed(int16_t seed)
 	App_game_life_update_display();
 }
 
+
+
+/* 打砖块游戏：布局参数 */
+#define APP_GAME_BLOCK_COLS      17      /* 砖块列数 */
+#define APP_GAME_BLOCK_ROWS      5       /* 砖块行数 */
+#define APP_GAME_BLOCK_X0        5       /* 砖块区距左边界 */
+#define APP_GAME_BLOCK_Y0        2       /* 砖块区距顶 */
+#define APP_GAME_BLOCK_W         6       /* 砖块宽 */
+#define APP_GAME_BLOCK_H         3       /* 砖块高 */
+#define APP_GAME_BLOCK_GAPX      1       /* 砖块横向间隔 */
+#define APP_GAME_BLOCK_GAPY      1       /* 砖块纵向间隔 */
+
+#define APP_GAME_BAFFLE_W        20      /* 挡板宽 */
+#define APP_GAME_BAFFLE_H        3       /* 挡板高 */
+#define APP_GAME_BAFFLE_Y        58      /* 挡板顶部 Y */
+
+#define APP_GAME_BALL_R          2       /* 小球半径 */
+#define APP_GAME_BALL_SPEED      1.0f    /* 小球速度：每16ms标准帧1px */
+
+/* 打砖块游戏：状态枚举 */
+typedef enum
+{
+	APP_GAME_BLOCK_READY = 0,    /* 初始：球贴挡板等待发射 */
+	APP_GAME_BLOCK_PLAYING,      /* 游戏中：球运动，碰撞检测生效 */
+	APP_GAME_BLOCK_PAUSED,       /* 暂停 */
+	APP_GAME_BLOCK_GAMEOVER,     /* 失败：球掉出底部 */
+	APP_GAME_BLOCK_WIN           /* 胜利：砖块全部消除 */
+} App_game_block_state_t;
+
+/* 打砖块游戏：状态结构体 */
+typedef struct
+{
+	uint32_t blocks[APP_GAME_BLOCK_ROWS];   /* 砖块位图：每行17位，1=存在 */
+	uint8_t state;                          /* 游戏状态（App_game_block_state_t） */
+	int16_t ball_x, ball_y;                 /* 球心坐标 */
+	float ball_vx, ball_vy;                 /* 球速度分量 */
+	int16_t board_x;                        /* 挡板左 X */
+	uint16_t score;                         /* 得分 */
+} App_game_block_t;
+
+static App_game_block_t App_game_block;     /* 打砖块游戏状态 */
+
+static void App_game_block_init(void);
+static void App_game_block_draw(void);
+
+/**
+  * 函  数：App_game_block_init
+  * 功  能：打砖块复位：砖块全部重建、挡板居中、球贴挡板、分数清零、状态 ready
+  */
+static void App_game_block_init(void)
+{
+	uint8_t i;
+
+	for (i = 0; i < APP_GAME_BLOCK_ROWS; i++)
+	{
+		App_game_block.blocks[i] = (1UL << APP_GAME_BLOCK_COLS) - 1;   /* 17 位全 1 */
+	}
+	App_game_block.state = APP_GAME_BLOCK_READY;
+	App_game_block.board_x = (128 - APP_GAME_BAFFLE_W) / 2;            /* 居中 */
+	App_game_block.ball_x = App_game_block.board_x + APP_GAME_BAFFLE_W / 2;   /* 球贴挡板中心 */
+	App_game_block.ball_y = APP_GAME_BAFFLE_Y - APP_GAME_BALL_R;       /* 球底贴挡板顶 */
+	App_game_block.ball_vx = 0;
+	App_game_block.ball_vy = 0;
+	App_game_block.score = 0;
+}
+
+/**
+  * 函  数：App_game_block_draw
+  * 功  能：打砖块全量绘制：砖块区 + 挡板 + 小球（每帧重绘，简单零残留）
+  */
+static void App_game_block_draw(void)
+{
+	uint8_t row, col;
+	int16_t x, y;
+
+	Inf_oled_clear();
+
+	/* 砖块区 */
+	for (row = 0; row < APP_GAME_BLOCK_ROWS; row++)
+	{
+		for (col = 0; col < APP_GAME_BLOCK_COLS; col++)
+		{
+			if (App_game_block.blocks[row] & (1UL << col))
+			{
+				x = APP_GAME_BLOCK_X0 + col * (APP_GAME_BLOCK_W + APP_GAME_BLOCK_GAPX);
+				y = APP_GAME_BLOCK_Y0 + row * (APP_GAME_BLOCK_H + APP_GAME_BLOCK_GAPY);
+				Inf_oled_show_image(x, y, APP_GAME_BLOCK_W, APP_GAME_BLOCK_H, block);
+			}
+		}
+	}
+
+	/* 挡板 */
+	Inf_oled_show_image(App_game_block.board_x, APP_GAME_BAFFLE_Y, APP_GAME_BAFFLE_W, APP_GAME_BAFFLE_H, baffle);
+
+	/* 小球 */
+	Inf_oled_draw_circle(App_game_block.ball_x, App_game_block.ball_y, APP_GAME_BALL_R, OLED_FILLED);
+
+	Inf_oled_update();
+}
+
+/**
+  * 函  数：App_game_block_run
+  * 功  能：打砖块游戏：ready 态球贴挡板，上下键横移挡板（上=左 下=右），长按退出。
+  *          发射/碰撞/结束态在后续段实现
+  */
+void App_game_block_run(void)
+{
+	uint8_t key;
+
+	App_game_block_init();
+
+	Inf_oled_fade_flag = 1;
+
+	while (1)
+	{
+		key = Inf_key_scan();
+
+		if (key == 1 || key == 2)               /* 挡板移动：上键=左移 下键=右移 */
+		{
+			if (key == 1) { App_game_block.board_x -= 4; }
+			else          { App_game_block.board_x += 4; }
+			if (App_game_block.board_x < 0) { App_game_block.board_x = 0; }
+			if (App_game_block.board_x > 128 - APP_GAME_BAFFLE_W) { App_game_block.board_x = 128 - APP_GAME_BAFFLE_W; }
+
+			if (App_game_block.state == APP_GAME_BLOCK_READY)   /* ready：球跟随挡板 */
+			{
+				App_game_block.ball_x = App_game_block.board_x + APP_GAME_BAFFLE_W / 2;
+			}
+		}
+
+		App_game_block_draw();
+
+		Inf_oled_gradient(1);
+
+		if (key == 4)                           /* 长按：退出 */
+		{
+			Inf_oled_fade_flag = 1;
+			Inf_oled_gradient(0);
+			return;
+		}
+	}
+}
