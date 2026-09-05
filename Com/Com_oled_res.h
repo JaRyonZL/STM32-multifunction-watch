@@ -62,6 +62,8 @@ extern const uint8_t mp3right[];
 
 extern const uint8_t CNLib[];
 extern const uint8_t calcu[];
+extern const uint8_t block[];
+extern const uint8_t baffle[];
 
 extern const uint8_t APPsetting[];
 extern const uint8_t APPWXZF[];
