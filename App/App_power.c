@@ -7,6 +7,8 @@
 #include "Inf_oled.h"
 #include "Drv_pwr.h"
 #include "Com_board.h"
+#include "Inf_key.h"
+#include "Drv_tim.h"
 
 /******************************************************************************
  * 文件名：App_power.c（应用层）
@@ -42,7 +44,17 @@ void App_power_off(void)
 
 	Inf_oled_write_command(0xAF);	/* 开显示 */
 
-	GPIO_ResetBits(MEAS_PWR_PORT, MEAS_PWR_PIN);	/* 恢复测量电源（0=接通） */
+	GPIO_ResetBits(MEAS_PWR_PORT, MEAS_PWR_PIN);
+
+	/* 等待按键松开：避免唤醒按键误触发菜单 */
+	{
+		uint32_t last_key_tick = Drv_tim2_get_tick();
+		while (1)
+		{
+			if (Inf_key_scan() != 0) { last_key_tick = Drv_tim2_get_tick(); }
+			if ((Drv_tim2_get_tick() - last_key_tick) > 150) { break; }   /* 150ms无事件视为松开（大于连发间隔100ms） */
+		}
+	}
 }
 
 /**

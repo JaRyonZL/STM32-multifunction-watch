@@ -35,6 +35,16 @@ int main(void)
     Drv_adc1_init();
 	Inf_battery_init(); /* 电池检测（内部含JTAG重映射PB3/PB4/PA15） */
 	Inf_key_init();     /* 按键初始化 */
+
+	/* 等待按键松开：避免唤醒按键误触发菜单 */
+	{
+		uint32_t last_key_tick = Drv_tim2_get_tick();
+		while (1)
+		{
+			if (Inf_key_scan() != 0) { last_key_tick = Drv_tim2_get_tick(); }
+			if ((Drv_tim2_get_tick() - last_key_tick) > 150) { break; }   /* 150ms无事件视为松开（大于连发间隔100ms） */
+		}
+	}
 	Inf_mp3_detect_init();   /* MP3电源检测输入（暂不驱动PA12功放使能，防漏电拉高PA11） */
 	Drv_pwr_wakeup_init();   /* PA0 EXTI0唤醒 */
 
